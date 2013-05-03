@@ -9,7 +9,7 @@
 
 ------------------------------------------------------------------------------
 
-module Main (main) where
+module SdfCoverage (main) where
 
 import SdfLib
 import ATermLib

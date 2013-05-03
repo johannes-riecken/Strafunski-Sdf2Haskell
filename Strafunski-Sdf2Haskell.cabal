@@ -1,5 +1,5 @@
 name:                Strafunski-Sdf2Haskell
-version:             1.0.0.2
+version:             1.1.0.0
 synopsis:            Converts SDF to Haskell
 description:         Generates code for using SDF grammars in Haskell. See <http://www.syntax-definition.org/> for more information about SDF.
 category:            Language
@@ -30,19 +30,19 @@ executable Sdf2Haskell
       ScopedTypeVariables,
       IncoherentInstances
 
-    build-depends:  base <= 4.6.0.1,
-                    Strafunski-ATermLib<=1.6.1,
+    build-depends:  base <= 4.19,
+                    Strafunski-ATermLib==1.7.0.0,
                     template-haskell,
-                    pretty <= 1.1.1.0,
-                    mtl <= 2.1.2,
-                    Strafunski-StrategyLib <= 5.0.1,
-                    directory <= 1.2.0.1,
-                    process <= 1.1.0.2,
-                    haskell-src <= 1.0.2
+                    pretty <= 1.2,
+                    mtl <= 2.4,
+                    Strafunski-StrategyLib == 5.1.0.0,
+                    directory <= 1.4,
+                    process <= 1.7,
+                    haskell-src <= 1.1
 
     main-is:        Sdf2Haskell.hs
     hs-source-dirs: generator
-    other-modules: CFG,
+    other-modules: Cfg,
                    GPP,
                    HaskellLib,
                    ImplodePT,
