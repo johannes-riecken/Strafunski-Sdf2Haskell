@@ -38,7 +38,8 @@ executable Sdf2Haskell
                     Strafunski-StrategyLib == 5.1.0.0,
                     directory <= 1.4,
                     process <= 1.7,
-                    haskell-src <= 1.1
+                    haskell-src <= 1.1,
+                    containers <= 0.7
 
     main-is:        Sdf2Haskell.hs
     hs-source-dirs: generator
@@ -55,7 +56,7 @@ executable Sdf2Haskell
                    SdfCoverage,
                    SdfEqInstances,
                    SdfLib,
-                   --SdfMetrics,
+                   SdfMetrics,
                    SdfOrdInstances,
                    SdfPP,
                    SyntaxATermConvertibleInstances

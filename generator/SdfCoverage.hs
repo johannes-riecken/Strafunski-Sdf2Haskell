@@ -12,14 +12,18 @@
 module SdfCoverage (main) where
 
 import SdfLib
-import ATermLib
+import Data.ATerm.Lib
 import SGLR
-import System
-import Configuration
-import Data.Set
+import Control.Exception
+import System.Environment
+import System.Process
+-- import Configuration
+import qualified Data.Set as Set
+import Data.Set (Set(..))
 import SdfOrdInstances
 import Data.Unique (newUnique, hashUnique)
-import Data.FiniteMap
+import qualified Data.Map as Map
+import Data.Map (Map(..))
 import Data.Char
 import Debug.Trace
 import Text.PrettyPrint.HughesPJ (Mode(..))
@@ -34,14 +38,14 @@ sdfCoverage :: FilePath -> [FilePath] -> String -> FilePath -> IO ()
 sdfCoverage tableFile termFiles sortName outputFile = do
   progName <- getProgName
   ps <- fmap filterRejects $ dumpProductions tableFile
-  let prodCount = cardinality ps
+  let prodCount = Set.size ps
   errLn $ "["++progName++"] Number of productions: "++(show prodCount)
   bag <- foldM (cummulativeCoverage tableFile sortName ps) (emptyBag) termFiles
   errLn ""
   errLn $ "["++progName++"] --- CUMULATIVE ---"
   reportErrLong ps bag
-  let usedProds = mkSet $ keysFM $ fm bag
-  let unusedProds = ps `minusSet` usedProds
+  let usedProds = Set.fromList $ Map.keys $ fm bag
+  let unusedProds = ps Set.\\ usedProds
   reportFile unusedProds outputFile
 
 -- | Obtain the productions from a given parse table as a set of ATerms.
@@ -56,12 +60,12 @@ dumpProductions tableName = do
   exitOK $ system cmd
   asfix <- readFile asfixName
   let ps = map (readATerm . dropWhile isSpace . dropWhile (not . isSpace)) $ lines asfix
-  return $ mkSet ps
+  return $ Set.fromList ps
 
 -- | Remove reject productions from set of productions.
 filterRejects :: Set ATerm -> Set ATerm
 filterRejects prods
-  = mkSet $ filter (not . isReject) $ setToList prods
+  = Set.fromList $ filter (not . isReject) $ Set.toList prods
     where
       isReject (AAppl "prod" [_,_,AAppl "attrs" [AList [AAppl "reject" []]]]) = True
       isReject _ = False
@@ -75,7 +79,7 @@ cummulativeCoverage tableFile sortName prods accu f = do
   let accu' = b `unionBag` accu
   reportErrShort prods accu'
   return accu'
-  `catch` \error -> do
+  `catch` \(SomeException error) -> do
     progName <- getProgName
     errLn $ "["++progName++"] Skipping file: "++f
     return accu
@@ -115,10 +119,10 @@ collectProds _ = []
 
 -- | Collect all productions from a given aterm, and return them in a set.
 collectProdSet :: ATerm -> Set ATerm
-collectProdSet t = worker t emptySet
+collectProdSet t = worker t Set.empty
   where
     worker :: ATerm -> Set ATerm -> Set ATerm
-    worker p@(AAppl "prod" ts) = (`addToSet` p)
+    worker p@(AAppl "prod" ts) = Set.insert p
     worker (AAppl f ts) = foldr ((.) . worker) id ts
     worker (AList ts) = foldr ((.) . worker) id ts
     worker _ = id
@@ -145,25 +149,25 @@ foldl' f a (x:xs) = (foldl' f $! f a x) xs
 reportFile :: Set ATerm -> FilePath -> IO ()
 reportFile unusedProds outputFile = do  
   progName <- getProgName
-  let content = unlines $ map unparseProd $ setToList unusedProds
+  let content = unlines $ map unparseProd $ Set.toList unusedProds
   writeFile outputFile content
   errLn $ "["++progName++"] Unused productions written to file: "++outputFile
   
 reportErrLong :: Set ATerm -> Bag ATerm -> IO ()
 reportErrLong prods prodBag = do
   progName <- getProgName
-  let prodCount = cardinality prods
-  let usedProds = mkSet $ keysFM $ fm prodBag
-  let usedProdCount = cardinality usedProds
-  let usageCount = sum $ eltsFM $ fm prodBag
+  let prodCount = Set.size prods
+  let usedProds = Set.fromList $ Map.keys $ fm prodBag
+  let usedProdCount = Set.size usedProds
+  let usageCount = sum $ Map.elems $ fm prodBag
   errLn $ "["++progName++"] Number of USED productions: "++(show usedProdCount)
   errLn $ "["++progName++"] Number of production USES : "++(show usageCount)
-  let unusedProds = prods `minusSet` usedProds
-  let unusedProdCount = cardinality unusedProds
+  let unusedProds = prods Set.\\ usedProds
+  let unusedProdCount = Set.size unusedProds
   errLn $ "["++progName++"] Number of productions NOT used: "++(show unusedProdCount)
   errLn $ "["++progName++"] COVERAGE: "++(show (usedProdCount*100 `div` prodCount))++" %"
-  let usedVarCount  = cardinality $ mkSet $ map takeSortFromATerm $ setToList usedProds
-  let totalVarCount = cardinality $ mkSet $ map takeSortFromATerm $ setToList prods
+  let usedVarCount  = Set.size $ Set.fromList $ map takeSortFromATerm $ Set.toList usedProds
+  let totalVarCount = Set.size $ Set.fromList $ map takeSortFromATerm $ Set.toList prods
   errLn $ "["++progName++"] NON-TERMINAL COVERAGE: "++(show (usedVarCount*100 `div` totalVarCount))++ " %"
 
 
@@ -174,9 +178,9 @@ takeSortFromATerm = show . getSort . convertProd
 reportErrShort :: Set ATerm -> Bag ATerm -> IO ()
 reportErrShort prods prodBag = do
   progName <- getProgName
-  let prodCount = cardinality prods
-  let usedProds = mkSet $ keysFM $ fm prodBag
-  let usedProdCount = cardinality usedProds
+  let prodCount = Set.size prods
+  let usedProds = Set.fromList $ Map.keys $ fm prodBag
+  let usedProdCount = Set.size usedProds
   errLn $ "["++progName++"] COVERAGE: "++(show (usedProdCount*100 `div` prodCount))++" %"
 
 ------------------------------------------------------------------------------
@@ -389,16 +393,16 @@ testVDM =
 -- * Bags
 
 -- | The type of bags.
-newtype Bag a = Bag {fm :: FiniteMap a Int} deriving Eq
+newtype Bag a = Bag {fm :: Map a Int} deriving Eq
 
 -- | Add an element to a bag.
 addToBag :: Ord a => Bag a -> a -> Bag a
 addToBag Bag{ fm=bag } a
-  = Bag (addToFM_C (+) bag a 1)
+  = Bag (Map.insertWith (+) a 1 bag)
 
 -- | Empty bag.
 emptyBag :: Bag a
-emptyBag = Bag emptyFM
+emptyBag = Bag Map.empty
 
 -- | Put all elements from a list into a bag.
 listToBag :: Ord a => [a] -> Bag a
@@ -408,11 +412,11 @@ listToBag xs
 -- | Create the union of a list of bags.
 unionBags :: Ord a => [Bag a] -> Bag a
 unionBags bags = 
-  Bag $ foldr (plusFM_C (+)) emptyFM $ map fm bags
+  Bag $ foldr (Map.unionWith (+)) Map.empty $ map fm bags
   
 -- | Create the union of two bags.
 unionBag :: Ord a => Bag a -> Bag a -> Bag a
 unionBag b1 b2 = 
-  Bag $ plusFM_C (+) (fm b1) (fm b2)
+  Bag $ Map.unionWith (+) (fm b1) (fm b2)
 
 ------------------------------------------------------------------------------
