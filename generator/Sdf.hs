@@ -30,8 +30,7 @@ data Grammar = Aliases     Aliases
 data Alias = Alias     Symbol Symbol
       deriving ( Data, Typeable, Show )
 
-data Aliases = List     [Alias]
-      deriving ( Data, Typeable, Show )
+type Aliases = [Alias]
 
 data Lookahead = CharClass      CharClass
 	       | Seq     CharClass Lookaheads
@@ -45,8 +44,7 @@ data Lookaheads = Single     Lookahead
 data Restriction = Follow     Symbols Lookaheads
       deriving ( Data, Typeable, Show )
 
-data Restrictions = List2     [Restriction]
-      deriving ( Data, Typeable, Show )
+type Restrictions = [Restriction]
 
 data Attribute = Reject
 	       | Prefer
@@ -164,8 +162,7 @@ data Renaming = Symbol     Symbol Symbol
 	      | Production     Production Production
       deriving ( Data, Typeable, Show )
 
-data Definition = List4     [Module]
-      deriving ( Data, Typeable, Show )
+type Definition = [Module]
 
 data Module = Module      ModuleName [ImpSection] Sections
       deriving ( Data, Typeable, Show )
@@ -174,8 +171,7 @@ data Section = Exports      Grammar
 	     | Hiddens     Grammar
       deriving ( Data, Typeable, Show )
 
-data Sections = List5     [Section]
-      deriving ( Data, Typeable, Show )
+type Sections = [Section]
 
 data ModuleName = Unparameterized     ModuleId
 		| Parameterized     ModuleId Symbols
@@ -184,22 +180,19 @@ data ModuleName = Unparameterized     ModuleId
 data ImpSection = Imports      Imports
       deriving ( Data, Typeable, Show )
 
-data Imports = List6     [Import]
-      deriving ( Data, Typeable, Show )
+type Imports = [Import]
 
 data Import = Module1     ModuleName
 	    | RenamedModule      ModuleName Renamings
       deriving ( Data, Typeable, Show )
 
-data Symbols = List7     [Symbol]
-      deriving ( Data, Typeable, Show )
+type Symbols = [Symbol]
 
 data Attributes = Attrs     [Attribute]
 		| NoAttrs
       deriving ( Data, Typeable, Show )
 
-data Productions = List8     [Production]
-      deriving ( Data, Typeable, Show )
+type Productions = [Production]
 
 data SDF = Definition     Definition
        deriving ( Data, Typeable, Show )
@@ -271,11 +264,6 @@ instance ATermConvertible Alias where
 						  ab' = fromATerm ab in (Alias     aa' ab')
     fromATerm u = fromATermError "Alias" u
 
-instance ATermConvertible Aliases where
-    toATerm (List     aa) = (AAppl "List"     [ toATerm aa ])
-    fromATerm (AAppl "List"     [ aa ]) = let aa' = fromATerm aa in (List     aa')
-    fromATerm u = fromATermError "Aliases" u
-
 instance ATermConvertible Lookahead where
     toATerm (CharClass      aa) = (AAppl "CharClass"      [ toATerm aa ])
     toATerm (Seq     aa ab) = (AAppl "Seq"     [ toATerm aa,toATerm ab ])
@@ -299,11 +287,6 @@ instance ATermConvertible Restriction where
     fromATerm (AAppl "Follow"     [ aa,ab ]) = let aa' = fromATerm aa
 						   ab' = fromATerm ab in (Follow     aa' ab')
     fromATerm u = fromATermError "Restriction" u
-
-instance ATermConvertible Restrictions where
-    toATerm (List2     aa) = (AAppl "List2"     [ toATerm aa ])
-    fromATerm (AAppl "List2"     [ aa ]) = let aa' = fromATerm aa in (List2     aa')
-    fromATerm u = fromATermError "Restrictions" u
 
 instance ATermConvertible Attribute where
     toATerm Reject     = (AAppl "Reject"     [ ])
@@ -544,11 +527,6 @@ instance ATermConvertible Renaming where
 						       ab' = fromATerm ab in (Production     aa' ab')
     fromATerm u = fromATermError "Renaming" u
 
-instance ATermConvertible Definition where
-    toATerm (List4     aa) = (AAppl "List4"     [ toATerm aa ])
-    fromATerm (AAppl "List4"     [ aa ]) = let aa' = fromATerm aa in (List4     aa')
-    fromATerm u = fromATermError "Definition" u
-
 instance ATermConvertible Module where
     toATerm (Module      aa ab ac) = (AAppl "Module"      [ toATerm aa,toATerm ab,toATerm ac ])
     fromATerm (AAppl "Module"      [ aa,ab,ac ]) = let aa' = fromATerm aa
@@ -563,11 +541,6 @@ instance ATermConvertible Section where
     fromATerm (AAppl "Hiddens"     [ aa ]) = let aa' = fromATerm aa in (Hiddens     aa')
     fromATerm u = fromATermError "Section" u
 
-instance ATermConvertible Sections where
-    toATerm (List5     aa) = (AAppl "List5"     [ toATerm aa ])
-    fromATerm (AAppl "List5"     [ aa ]) = let aa' = fromATerm aa in (List5     aa')
-    fromATerm u = fromATermError "Sections" u
-
 instance ATermConvertible ModuleName where
     toATerm (Unparameterized     aa) = (AAppl "Unparameterized"     [ toATerm aa ])
     toATerm (Parameterized     aa ab) = (AAppl "Parameterized"     [ toATerm aa,toATerm ab ])
@@ -581,11 +554,6 @@ instance ATermConvertible ImpSection where
     fromATerm (AAppl "Imports"      [ aa ]) = let aa' = fromATerm aa in (Imports      aa')
     fromATerm u = fromATermError "ImpSection" u
 
-instance ATermConvertible Imports where
-    toATerm (List6     aa) = (AAppl "List6"     [ toATerm aa ])
-    fromATerm (AAppl "List6"     [ aa ]) = let aa' = fromATerm aa in (List6     aa')
-    fromATerm u = fromATermError "Imports" u
-
 instance ATermConvertible Import where
     toATerm (Module1     aa) = (AAppl "Module1"     [ toATerm aa ])
     toATerm (RenamedModule      aa ab) = (AAppl "RenamedModule"      [ toATerm aa,toATerm ab ])
@@ -594,22 +562,12 @@ instance ATermConvertible Import where
 							   ab' = fromATerm ab in (RenamedModule      aa' ab')
     fromATerm u = fromATermError "Import" u
 
-instance ATermConvertible Symbols where
-    toATerm (List7     aa) = (AAppl "List7"     [ toATerm aa ])
-    fromATerm (AAppl "List7"     [ aa ]) = let aa' = fromATerm aa in (List7     aa')
-    fromATerm u = fromATermError "Symbols" u
-
 instance ATermConvertible Attributes where
     toATerm (Attrs     aa) = (AAppl "Attrs"     [ toATerm aa ])
     toATerm NoAttrs      = (AAppl "NoAttrs"      [ ])
     fromATerm (AAppl "Attrs"     [ aa ]) = let aa' = fromATerm aa in (Attrs     aa')
     fromATerm (AAppl "NoAttrs"      [ ]) = let in NoAttrs
     fromATerm u = fromATermError "Attributes" u
-
-instance ATermConvertible Productions where
-    toATerm (List8     aa) = (AAppl "List8"     [ toATerm aa ])
-    fromATerm (AAppl "List8"     [ aa ]) = let aa' = fromATerm aa in (List8     aa')
-    fromATerm u = fromATermError "Productions" u
 
 instance ATermConvertible SDF where
     toATerm (Definition     aa) = (AAppl "Definition"     [ toATerm aa ])
