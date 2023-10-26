@@ -7,7 +7,16 @@ use Data::Dumper;
 $^I = '';
 $/ = '';
 
+my %removed;
+
 while (<>) {
-    s/^data (\S++) = List\d*+ ++(\[[^ \]]*+\])\n\s*+deriving \([^\(\)]++\)\s*+$/type $1 = $2\n\n/;
+    if (s/^data (\S++) = List\d*+ ++(\[[^ \]]*+\])\n\s*+deriving \([^\(\)]++\)\s*+$/type $1 = $2\n\n/) {
+        $removed{$1} = !!1;
+    }
+    for my $k (keys %removed) {
+        if (/^instance ATermConvertible $k where/) {
+            $_ = '';
+        }
+    }
     print;
 }
