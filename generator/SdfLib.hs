@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -30,7 +30,7 @@ import Data.ATerm.Lib (dehyphen)
 collectLexSorts :: SDF -> [Symbol]
 collectLexSorts
   = runIdentity . applyTU ( full_tdTU (adhocTU (constTU []) worker) )
-    where 
+    where
       worker (Sdf_lexical_syntax ps) = return (map getSort (getProds ps))
       worker _                       = return []
 
@@ -38,7 +38,7 @@ collectLexSorts
 collectCfSorts :: SDF -> [Symbol]
 collectCfSorts
   = runIdentity . applyTU ( full_tdTU (adhocTU (constTU []) worker) )
-    where 
+    where
       worker (Sdf_context_free_syntax ps) = return (map getSort (getProds ps))
       worker _                            = return []
 
@@ -74,7 +74,7 @@ collectLexProductions
 collectRanges :: SDF -> [CharRanges]
 collectRanges
   = runIdentity . applyTU ( full_tdTU (adhocTU (constTU []) worker) )
-    where 
+    where
       worker (Sdf_present1 (Sdf_CharRange (Sdf_Character _))) = return []
       worker (Sdf_present1 r) = return [r]
 
@@ -85,12 +85,12 @@ collectRanges
 -- | Normalize Character Classes
 normalizeCharClass :: SDF -> SDF
 normalizeCharClass = runIdentity . applyTP ( full_tdTP (adhocTP idTP (return . worker)))
-    where 
+    where
  	worker :: [Symbol] -> [Symbol]
 	worker ss = concatMap elimConc ss
       	elimConc (Sdf_char_class1 (Sdf_simple_charclass (Sdf_present1 r)))
         	= map (\r -> Sdf_char_class1 (Sdf_simple_charclass (Sdf_present1 r))) (listRanges r)
-        elimConc s = [s] 
+        elimConc s = [s]
         listRanges (Sdf_conc r1 r2) = listRanges r1 ++ listRanges r2
         listRanges r                = [r]
 
@@ -128,9 +128,9 @@ getAttributes (Sdf_prod_fun l ss s as) = as
 getConsAttr :: Attributes -> Maybe String
 getConsAttr
   = applyTU ( once_tdTU (monoTU getCons) )
-    where getCons (Sdf_cons1 (Sdf_fun (Sdf_Literal lit))) 
+    where getCons (Sdf_cons1 (Sdf_fun (Sdf_Literal lit)))
             = Just . dehyphen . headToUpper . lit2string $ lit
-          getCons _				          
+          getCons _
             = Nothing
 	  headToUpper []     = []
 	  headToUpper (c:cs) = (toUpper c):cs
@@ -157,7 +157,7 @@ isRejectOrBracket prod
 
 -- | Turn a quoted literal into a non-quoted string
 dequote :: String -> String
-dequote ('\"':str) 
+dequote ('\"':str)
   = dequote' str
     where dequote' ['\"']         = ""
           dequote' ('\"':cs)      = error $ "Quoted literal extends after end quote: "++cs
@@ -166,7 +166,7 @@ dequote ('\"':str)
           --dequote' ('\\':'\"':cs)    = '\"':(dequote' cs)
           dequote' (c:cs)         = c:(dequote' cs)
 	  --dequote' cs = error ("Unexpected: "++cs)
-dequote str        
+dequote str
   = error $ "Quoted literal misses starting quote: "++str
 
 -- | Turn a literal (quoted or not) into a (non-quoted) string

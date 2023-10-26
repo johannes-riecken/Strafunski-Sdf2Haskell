@@ -34,7 +34,7 @@ javaGetImports :: CompilationUnit -> [ChaseName]
 javaGetImports (CU pkg_decl imports types)
   = map qname2str used_cls_names
     where
-      used_cls_names 
+      used_cls_names
         = runIdentity (applyTU (full_tdTU worker) (imports,types))
 
       worker   = constTU [] `adhocTU` getClsOrIfcType
@@ -46,13 +46,13 @@ javaGetImports (CU pkg_decl imports types)
       getImportedType (Import_semicolon name) = return [name]
 
 -- Find and read a pre-parsed java file
- 
-parseJavaFileOnPath :: [FilePath] -> ChaseName 
+
+parseJavaFileOnPath :: [FilePath] -> ChaseName
                     -> IO (Either CompilationUnit String)
 parseJavaFileOnPath clspth clsname
   = do --content <- chaseFile clspth relativeName ["java.af"]
        --let cu = fromATerm . afunCap . readATerm . dehyphen $ content
-       --return (Left cu)   
+       --return (Left cu)
        fileName <- findFile clspth relativeName ["java"]
        cu <- sglr tableName fileName "CompilationUnit"
        return (Left cu)

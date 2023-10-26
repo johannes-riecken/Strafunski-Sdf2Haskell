@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer   : Joost Visser
 -- Stability    : experimental
 -- Portability  : portable
@@ -23,13 +23,13 @@ import Data.ATerm.Lib (toATermString,dehyphen) -- For debugging
 
 
 ------------------------------------------------------------------------------
--- * Starting point 
+-- * Starting point
 
--- | Generate Haskell module with type declarations for 
+-- | Generate Haskell module with type declarations for
 --   representation of abstract syntax.
 generateSyntaxModule :: String -> SDF -> HsModule
 generateSyntaxModule name sdf
-  = mkModule name [] (genSyntaxDecls sdf)     
+  = mkModule name [] (genSyntaxDecls sdf)
 
 -- | Generate type declarations for representation of abstract syntax.
 genSyntaxDecls :: SDF -> [HsDecl]
@@ -38,7 +38,7 @@ genSyntaxDecls sdf
     (genTypeDecls sdf)
 
 ------------------------------------------------------------------------------
--- * Generate type synonyms from lexical sorts 
+-- * Generate type synonyms from lexical sorts
 
 -- | Generate Haskell type declarations for all lexical sorts defined
 --   in a given SDF grammar.
@@ -48,9 +48,9 @@ genTypeDecls sdf
 
 -- | Convert a lexical SDF sort to a Haskell type synonym.
 sort2typedecl :: Symbol -> [HsDecl]
-sort2typedecl (Sdf_sort str) 
+sort2typedecl (Sdf_sort str)
   = [HsTypeDecl noLoc (HsIdent $ dehyphen str) [] (mkTyCon "String")]
-sort2typedecl _              
+sort2typedecl _
   = []
 
 ------------------------------------------------------------------------------
@@ -71,14 +71,14 @@ production2datadecl :: Production -> Maybe HsDecl
 production2datadecl prod
   = production2decl mkDecl prod
     where
-      mkDecl typename consname symbols  
+      mkDecl typename consname symbols
         = mkHsDataDecl typename consname (symbols2types symbols)
       mkHsDataDecl hsname str ts
-        = HsDataDecl noLoc [] hsname [] 
+        = HsDataDecl noLoc [] hsname []
             [HsConDecl noLoc (HsIdent str) ts] []
 
 
--- | Convert Sdf symbols to Haskell types. 
+-- | Convert Sdf symbols to Haskell types.
 symbols2types :: [Symbol] -> [HsBangType]
 symbols2types symbols
   = concatMap symbol2bangtype symbols
@@ -95,7 +95,7 @@ symbol2bangtype s
       s2t (Sdf_lit l)               = []
       s2t (Sdf_sort s)              = [mkTyCon $ dehyphen s]
       s2t (Sdf_seq1 s ss)           = let ts = concatMap s2t (s:ss)
-                                      in if (ts == []) 
+                                      in if (ts == [])
                                          then [] else [HsTyTuple ts]
       s2t (Sdf_opt s)               = let s' = do t <- s2t s
                                                   [mkTyApp "Maybe" [t]]
@@ -115,7 +115,7 @@ symbol2bangtype s
       --s2t (Sdf_cf Symbol)
       --s2t (Sdf_layout)
       s2t _                         = []
-      
+
       voidOr [] = [HsTyTuple []]
       voidOr ss = ss
 

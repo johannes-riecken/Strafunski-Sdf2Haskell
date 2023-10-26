@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer   : Joost Visser
 -- Stability    : experimental
 -- Portability  : portable
@@ -25,7 +25,7 @@ import Sdf2Syntax (symbol2bangtype)
 generatePrettyModule :: String -> String -> SDF -> HsModule
 generatePrettyModule name moduleName sdf
   = mkModule moduleName (prettyImports name) (genPrettyDecls name sdf)
-       
+
 ------------------------------------------------------------------------------
 -- * Generation of imports
 
@@ -38,7 +38,7 @@ prettyImports name
                 "GPP",
                 "StrategyLib"
               ]
-              
+
 ------------------------------------------------------------------------------
 -- * Generation of function definitions
 
@@ -51,7 +51,7 @@ genPrettyDecls name sdf
 -- | Generate the generic pretty-printing function.
 genPrettyFun :: String -> SDF -> [HsDecl]
 genPrettyFun name sdf
-  = [ HsTypeSig noLoc [funName] funType, 
+  = [ HsTypeSig noLoc [funName] funType,
       HsFunBind [HsMatch noLoc funName [HsPVar . HsIdent $ "gpp"] rhs [] ]]
     where
       modName  = head $ reverse $ splitBy '.' name
@@ -67,9 +67,9 @@ genPrettyFun name sdf
       mkAdhoc  = HsQVarOp . UnQual . HsIdent $ "adhocQ"
       mkUpd :: HsName -> HsExp
       mkUpd hsname
-        = HsParen $ HsExpTypeSig noLoc 
-            (HsApp (mkVar "pp") (mkVar "gpp")) 
-            (HsQualType [] (HsTyApp (HsTyCon (UnQual (HsIdent "MonoPP"))) 
+        = HsParen $ HsExpTypeSig noLoc
+            (HsApp (mkVar "pp") (mkVar "gpp"))
+            (HsQualType [] (HsTyApp (HsTyCon (UnQual (HsIdent "MonoPP")))
                                     (HsTyCon (UnQual hsname))))
 
 -- | Generate the instance declarations.
@@ -85,11 +85,11 @@ production2instdecl prod
   = production2decl mkDecl prod
     where
       mkDecl typename consname symbols
-        = HsInstDecl noLoc [] 
-            (UnQual . HsIdent $ "PP") 
-            [HsTyCon . UnQual $ typename] 
-            [HsFunBind 
-              [HsMatch noLoc (HsIdent "pp") [gppPat,mkPat consname symbols] 
+        = HsInstDecl noLoc []
+            (UnQual . HsIdent $ "PP")
+            [HsTyCon . UnQual $ typename]
+            [HsFunBind
+              [HsMatch noLoc (HsIdent "pp") [gppPat,mkPat consname symbols]
                  (mkRhs symbols) []
             ] ]
       gppPat
@@ -107,7 +107,7 @@ symbols2pvars symbols
       mkVar ([],_)     = []
       mkVar (s:_,v)    = [HsPVar . HsIdent $ v]
 
--- | Convert Sdf symbols into Doc expressions.      
+-- | Convert Sdf symbols into Doc expressions.
 symbols2docs :: [Symbol] -> [HsExp]
 symbols2docs symbols
   = map symbol2doc (zip variables symbols)
@@ -118,7 +118,7 @@ symbol2doc (var,s)
   = s2d (HsVar . UnQual . HsIdent $ var) s
     where
       gppExp = HsVar . UnQual . HsIdent $ "gpp"
-    
+
       s2d v (Sdf_label l s)         = s2d v s
       s2d v (Sdf_lit l)             = mkApp "gpp" [lit2hslit l]
       s2d v (Sdf_sort s)            = mkApp "gpp" [v]
@@ -131,7 +131,7 @@ symbol2doc (var,s)
       s2d v (Sdf_alt1 s1 s2)           = mkApp "gppEither" [gppExp,v]
 
       s2d v x = error ("s2d not defined for "++(take 50 (show x)))
-      
+
       lit2hslit l
         = HsLit . HsString . lit2string $ l
       sep2hslit (Sdf_lit l)   = lit2hslit l

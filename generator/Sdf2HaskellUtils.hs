@@ -1,11 +1,11 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
 --
 -- This module is part of 'Sdf2Haskell', a tool for generating Haskell
--- code from an SDF grammar. This module contains helper functions 
+-- code from an SDF grammar. This module contains helper functions
 -- for the conversion from Haskell to SDF.
 
 ------------------------------------------------------------------------------
@@ -28,9 +28,9 @@ production2decl :: MkDecl -> Production -> Maybe HsDecl
 production2decl mkDecl prod
   = case (getConsAttr (getAttributes prod),
           sort2hsname (getSort prod),
-          isRejectOrBracket prod) 
+          isRejectOrBracket prod)
     of
-      (Just str,Just hsname,False) 
+      (Just str,Just hsname,False)
          -> Just (mkDecl hsname str (getSyms prod))
       _  -> Nothing
 
@@ -39,7 +39,7 @@ sort2hsname :: Symbol -> Maybe HsName
 sort2hsname (Sdf_sort str) = Just (HsIdent (dehyphen str))
 sort2hsname _              = Nothing
 
--- | Convert an Sdf sort into a String 
+-- | Convert an Sdf sort into a String
 sort2string :: Symbol -> Maybe String
 sort2string (Sdf_sort str) = Just $ dehyphen str
 sort2string _              = Nothing

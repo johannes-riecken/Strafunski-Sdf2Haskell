@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Ralf Laemmel, Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -26,7 +26,7 @@ compensateImplodePT = limit (rmSTART . implodeNil . implodeAlternative . implode
 ------------------------------------------------------------------------------
 -- * Functions to compensate for bugs in implodePT
 
--- | Implode TCons 
+-- | Implode TCons
 implodeTCons :: ATerm -> ATerm
 implodeTCons (AAppl "TCons" [AList lst, AAppl "TNil" []])
                                                  = AList (map implodeTCons lst)
@@ -87,8 +87,8 @@ implodeOpt t				= t
 
 -- | Implode iterations.
 implodeIter :: ATerm -> ATerm
-implodeIter (AAppl "appl" 
-              [ AAppl "prod" 
+implodeIter (AAppl "appl"
+              [ AAppl "prod"
 	          [ AList [],
                     AAppl "cf" [AAppl "iter" [ sort ]],
 		    attrs
@@ -96,7 +96,7 @@ implodeIter (AAppl "appl"
 		AList []
 	      ]
 	    )
-  = AList []	    
+  = AList []
 implodeIter (AAppl f ts) 		= AAppl f (map implodeIter ts)
 implodeIter (AList ts)    		= AList (map implodeIter ts)
 implodeIter t				= t
@@ -131,7 +131,7 @@ implodeAlternative (AList ts)
    = AList (map implodeAlternative ts)
 implodeAlternative t
    = t
-   
+
 -- | Implode nil
 -- This is necessary because the ATerm representation after implodePT is not
 -- what was required for ATermConvertible
@@ -140,21 +140,21 @@ implodeNil (AAppl "TNil" []) = AAppl "()" []
 implodeNil (AAppl f ts)      = AAppl f (map implodeNil ts)
 implodeNil (AList ts)        = AList (map implodeNil ts)
 implodeNil t                 = t
-   
+
 -----------------------------------------------------------------------------
 
 -- | Remove start symbol.
 rmSTART :: ATerm -> ATerm
-rmSTART (AAppl "appl" 
-          [ AAppl "prod" 
+rmSTART (AAppl "appl"
+          [ AAppl "prod"
 	     [ AList [AAppl "cf" [AAppl "sort" [AAppl sort []]]],
 	       AAppl "sort" [AAppl "\"<START>\"" []],
 	       attrs
 	     ],
-	    AList [ term ] 
+	    AList [ term ]
 	  ]
 	)
-  = term	
+  = term
 rmSTART t = t
 
 
@@ -164,6 +164,6 @@ rmSTART t = t
 
 limit :: (Eq a) => (a -> a) -> a -> a
 limit f x = let res = f x
-            in if res == x 
+            in if res == x
                then res
                else limit f res

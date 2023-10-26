@@ -31,7 +31,7 @@ gppListSep gpp sp xs
 gppMaybe :: Term a => GPP -> Maybe a -> Doc
 gppMaybe gpp xs
   = maybe empty gpp xs
-  
+
 -- | Helper function for pretty-printing alternatives.
 gppEither :: (Term a, Term b) => GPP -> Either a b -> Doc
 gppEither gpp xs

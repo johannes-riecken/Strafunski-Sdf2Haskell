@@ -18,7 +18,7 @@ main
   = do errLn "\n == Generation of Package/Class Graph for Java == \n"
        javaIOwrap java2pcg
        errLn "\n == Done. ==  \n"
-  
+
 -------------------------------------------------------------------------------
 
 java2pcg 	:: [CompilationUnit] -> IO String
@@ -41,7 +41,7 @@ java2pcg' parent x
 	     i_es   <- mapM (\i -> java2pcg' (ident++"."++i) imports) idents
 	     edges  <- java2pcg' ident types
 	     return ((mkPkg ident)++(concat i_es)++edges)
-      class2pcg (Class1 _ classname super interfaces body) 
+      class2pcg (Class1 _ classname super interfaces body)
         = do ident <- return (parent++"."++classname)
 	     s_es  <- return (super2pcg ident super)
 	     i_es  <- return (interfaces2pcg ident interfaces)
@@ -55,18 +55,18 @@ java2pcg' parent x
 	     return ((mkPkg ident)++(mkImport parent ident))
       type2pcg (Name name)
         = return (mkImport parent (qname2str name))
-	     
-      super2pcg cls super 
+
+      super2pcg cls super
         = concatMap (mkInherit cls.qname2str) (collectNames super)
       interfaces2pcg cls interfaces
         = concatMap (mkImplement cls.qname2str) (collectNames interfaces)
-      
+
 ---
 
 collectDeclaredTypes x
   = applyTU (stop_tdTU worker) x
     where
-      worker = failTU `adhocTU` (\(Class1 _ ident _ _ _)  -> return [ident]) 
+      worker = failTU `adhocTU` (\(Class1 _ ident _ _ _)  -> return [ident])
                       `adhocTU` (\(Interface _ ident _ _) -> return [ident])
 
 packDecl2ident Nothing                         = "NO PACKAGE"
@@ -86,10 +86,10 @@ mkNesting s t  = quote s++" -> "++quote t++"\n"
 mkImport "" t = ""    -- This case takes care of root
 mkImport s t  = quote s++" -> "++quote t++" [ color=blue, arrowsize=0.5 ]\n"
 
-mkInherit t s  
+mkInherit t s
   = quote s++" -> "++quote t++" [ dir=back ]\n"++mkCls s
 
-mkImplement t s  
+mkImplement t s
   = quote s++" -> "++quote t++" [ dir=back, style=dotted ]\n"++mkIfc s
 
 mkPkg "" = ""
@@ -106,7 +106,7 @@ collectNames x
   = runIdentity (applyTU (full_tdTU worker) x)
     where
       worker = constTU [] `adhocTU` (\name -> return [name])
-	    
+
 --- Auxilliaries -------------------------------------------------------------
 
 quote s = "\""++s++"\""

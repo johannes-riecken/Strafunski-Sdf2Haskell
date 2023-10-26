@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Ralf Laemmel, Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -13,13 +13,13 @@
 
 module SGLR where
 
-import System.Exit 
+import System.Exit
 import System.Environment (getProgName)
 import System.Cmd (system)
 import Data.Unique (newUnique, hashUnique)
 import System.IO (readFile,hPutStrLn,stderr)
 import System.Directory (removeFile)
-import Data.ATerm.Lib (fromATerm, readATerm, ATermConvertible, 
+import Data.ATerm.Lib (fromATerm, readATerm, ATermConvertible,
                  dehyphenAST, afunCap, ATerm(..)
                 )
 import ImplodePT (compensateImplodePT)
@@ -42,11 +42,11 @@ sglr tableName termName sortName
                          " -i "++termName++
 			 " -o "++asfixName++
 			 " -s "++sortName
-       let implodeCmd = "implodePT -t -ALclpqX"++ 
+       let implodeCmd = "implodePT -t -ALclpqX"++
                                  " -i "++asfixName++
 				 " -o "++afName
        progName <- getProgName
-       errLn $ "["++progName++"] "++sglrCmd			 
+       errLn $ "["++progName++"] "++sglrCmd
        exitOK $ system sglrCmd
        errLn $ "["++progName++"] "++implodeCmd
        exitOK $ system implodeCmd
@@ -73,28 +73,28 @@ sglrSilent tableName termName sortName
        unique <- newUnique
        let newName   = termName ++ (show . hashUnique $ unique)
        let asfixName = newName ++ ".asfix"
-    
+
        let sglrCmd    = concat [ "sglr -p ", tableName, " -i ", termName
                                , " -o ", asfixName, " -s ", sortName]
        exitCode <- system sglrCmd
-    
+
        case exitCode of
           (ExitFailure code) -> do errLn $ "["++progName++"] "++sglrCmd
                                    removeFile asfixName
                                    fail $ "Exit code: " ++ show code
           (ExitSuccess)      -> return ()
-    
+
        let afName    = newName ++ ".af"
        let implodeCmd = concat [ "implodePT -t -ALclpqX -i ", asfixName
                                , " -o ", afName]
-       exitCode <- system implodeCmd    
-    
+       exitCode <- system implodeCmd
+
        case exitCode of
           (ExitFailure code) -> do errLn $ "["++progName++"] "++implodeCmd
                                    removeFile afName
                                    fail $ "Exit code: " ++ show code
           (ExitSuccess)      -> return ()
-    
+
        af <- readFile afName
        _  <- removeFile asfixName
        _  <- removeFile afName
@@ -103,14 +103,14 @@ sglrSilent tableName termName sortName
        let t2 = compensateImplodePT t1
        let t3 = afunCap t2
        return . fromATerm $ t3
-    
+
 
 -- | Helper function for reporting errors and progress to stderr
 errLn :: String -> IO ()
 errLn str = hPutStrLn stderr str
 
 -- | Ensure that the given computation exits with an error code
---   that indicates successful execution.       
+--   that indicates successful execution.
 exitOK :: IO ExitCode -> IO ()
 exitOK io
   = do exitCode <- io
@@ -118,4 +118,4 @@ exitOK io
          (ExitSuccess)   -> return ()
 	 (ExitFailure code) -> fail $ "Exit code: " ++ show code
 
-	 
+

@@ -8,7 +8,7 @@ import Data.Typeable
 import Data.ATerm.Lib
 import Data.Generics.Strafunski.StrategyLib.Models.Deriving.TermRep
 import Prelude hiding (Left, Right)
- 
+
 data Grammar = Aliases     Aliases
 	     | Restrictions     Restrictions
 	     | Sorts      Symbols
@@ -18,7 +18,7 @@ data Grammar = Aliases     Aliases
 	     | ContextFreeSyntax       Productions
 	     | Variables     Productions
 	     | LexicalVariables      Productions
-	     | EmptyGrammar     
+	     | EmptyGrammar
 	     | ConcGrammars      Grammar Grammar
 	     | Syntax     Productions
 	     | LexicalPriorities      Priorities
@@ -26,58 +26,58 @@ data Grammar = Aliases     Aliases
 	     | LexicalRestrictions      Restrictions
 	     | ContextFreeRestrictions       Restrictions
       deriving ( Data, Typeable, Show )
- 
+
 data Alias = Alias     Symbol Symbol
       deriving ( Data, Typeable, Show )
- 
+
 data Aliases = List     [Alias]
       deriving ( Data, Typeable, Show )
- 
+
 data Lookahead = CharClass      CharClass
 	       | Seq     CharClass Lookaheads
       deriving ( Data, Typeable, Show )
- 
+
 data Lookaheads = Single     Lookahead
 		| Alt     Lookaheads Lookaheads
 		| List1     [Lookahead]
       deriving ( Data, Typeable, Show )
- 
+
 data Restriction = Follow     Symbols Lookaheads
       deriving ( Data, Typeable, Show )
- 
+
 data Restrictions = List2     [Restriction]
       deriving ( Data, Typeable, Show )
- 
-data Attribute = Reject    
-	       | Prefer    
-	       | Avoid    
+
+data Attribute = Reject
+	       | Prefer
+	       | Avoid
 	       | Cons1     ATerm'
-	       | Constructor    
-	       | Memo    
-	       | Traverse    
-	       | Bracket    
+	       | Constructor
+	       | Memo
+	       | Traverse
+	       | Bracket
 	       | Atr     Associativity
 	       | Id     ModuleName
       deriving ( Data, Typeable, Show )
- 
+
 data OptExp = Present     IntCon
-	    | Absent    
+	    | Absent
       deriving ( Data, Typeable, Show )
- 
+
 data RealCon = RealCon      IntCon NatCon OptExp
       deriving ( Data, Typeable, Show )
- 
+
 data AFun = Literal     Literal
       deriving ( Data, Typeable, Show )
- 
+
 data ATerm' = Fun     AFun
       deriving ( Data, Typeable, Show )
- 
+
 data Symbol = Label     Literal Symbol
 	    | Lit     Literal
 	    | Sort     Sort
 	    | CharClass1      CharClass
-	    | Empty1    
+	    | Empty1
 	    | Seq1     Symbol [Symbol]
 	    | Opt     Symbol
 	    | Iter     Symbol
@@ -94,138 +94,138 @@ data Symbol = Label     Literal Symbol
 	    | Cf     Symbol
 	    | Lex     Symbol
 	    | Varsym     Symbol
-	    | Layout    
-	    | Start    
-	    | FileStart     
+	    | Layout
+	    | Start
+	    | FileStart
       deriving ( Data, Typeable, Show )
- 
+
 data Literal = Quoted     QLiteral
 	     | Uqlit     UQLiteral
       deriving ( Data, Typeable, Show )
- 
+
 data Production = ProdFun      Literal [Symbol] Symbol Attributes
 		| Prod     Symbols Symbol Attributes
       deriving ( Data, Typeable, Show )
- 
+
 data Character = Numeric     NumChar
 	       | Short     ShortChar
-	       | Top    
-	       | Eof    
-	       | Bot    
-	       | LabelStart     
+	       | Top
+	       | Eof
+	       | Bot
+	       | LabelStart
       deriving ( Data, Typeable, Show )
- 
+
 data CharRange = Character     Character
 	       | Range     Character Character
       deriving ( Data, Typeable, Show )
- 
+
 data CharRanges = CharRange     CharRange
 		| Conc     CharRanges CharRanges
       deriving ( Data, Typeable, Show )
- 
-data OptCharRanges = Absent1    
+
+data OptCharRanges = Absent1
 		   | Present1     CharRanges
       deriving ( Data, Typeable, Show )
- 
+
 data CharClass = SimpleCharclass      OptCharRanges
 	       | Comp     CharClass
 	       | Diff     CharClass CharClass
 	       | Isect     CharClass CharClass
 	       | Union     CharClass CharClass
       deriving ( Data, Typeable, Show )
- 
-data Associativity = Left    
-		   | Right    
-		   | NonAssoc     
-		   | Assoc    
+
+data Associativity = Left
+		   | Right
+		   | NonAssoc
+		   | Assoc
       deriving ( Data, Typeable, Show )
- 
+
 data Group = SimpleGroup      Production
 	   | ProdsGroup      Productions
 	   | AssocGroup      Associativity Productions
       deriving ( Data, Typeable, Show )
- 
+
 data Priority = Chain     [Group]
 	      | Assoc1     Group Associativity Group
       deriving ( Data, Typeable, Show )
- 
+
 data Priorities = Comma     [Priority]
       deriving ( Data, Typeable, Show )
- 
+
 data IntCon = Natural     NatCon
 	    | Positive     NatCon
 	    | Negative     NatCon
       deriving ( Data, Typeable, Show )
- 
+
 data Renamings = Renamings     [Renaming]
       deriving ( Data, Typeable, Show )
- 
+
 data Renaming = Symbol     Symbol Symbol
 	      | Production     Production Production
       deriving ( Data, Typeable, Show )
- 
+
 data Definition = List4     [Module]
       deriving ( Data, Typeable, Show )
- 
+
 data Module = Module      ModuleName [ImpSection] Sections
       deriving ( Data, Typeable, Show )
- 
+
 data Section = Exports      Grammar
 	     | Hiddens     Grammar
       deriving ( Data, Typeable, Show )
- 
+
 data Sections = List5     [Section]
       deriving ( Data, Typeable, Show )
- 
+
 data ModuleName = Unparameterized     ModuleId
 		| Parameterized     ModuleId Symbols
       deriving ( Data, Typeable, Show )
- 
+
 data ImpSection = Imports      Imports
       deriving ( Data, Typeable, Show )
- 
+
 data Imports = List6     [Import]
       deriving ( Data, Typeable, Show )
- 
+
 data Import = Module1     ModuleName
 	    | RenamedModule      ModuleName Renamings
       deriving ( Data, Typeable, Show )
- 
+
 data Symbols = List7     [Symbol]
       deriving ( Data, Typeable, Show )
- 
+
 data Attributes = Attrs     [Attribute]
-		| NoAttrs     
+		| NoAttrs
       deriving ( Data, Typeable, Show )
- 
+
 data Productions = List8     [Production]
       deriving ( Data, Typeable, Show )
- 
+
 data SDF = Definition     Definition
        deriving ( Data, Typeable, Show )
 
 type AlphaNumericalEscChar = String
- 
+
 type DecimalEscChar = String
- 
+
 type EscChar = String
- 
+
 type L_Char = String
- 
+
 type QLiteral = String
- 
+
 type UQLiteral = String
- 
+
 type Sort = String
- 
+
 type NumChar = String
- 
+
 type ShortChar = String
- 
+
 type NatCon = String
- 
+
 type ModuleWord = String
- 
+
 type ModuleId = String
 
 {-* Generated by DrIFT : Look, but Don't Touch. *-}
@@ -255,7 +255,7 @@ instance ATermConvertible Grammar where
     fromATerm (AAppl "ContextFreeSyntax"       [ aa ]) = let aa' = fromATerm aa in (ContextFreeSyntax       aa')
     fromATerm (AAppl "Variables"     [ aa ]) = let aa' = fromATerm aa in (Variables     aa')
     fromATerm (AAppl "LexicalVariables"      [ aa ]) = let aa' = fromATerm aa in (LexicalVariables      aa')
-    fromATerm (AAppl "EmptyGrammar"      [ ]) = let in EmptyGrammar     
+    fromATerm (AAppl "EmptyGrammar"      [ ]) = let in EmptyGrammar
     fromATerm (AAppl "ConcGrammars"      [ aa,ab ]) = let aa' = fromATerm aa
 							  ab' = fromATerm ab in (ConcGrammars      aa' ab')
     fromATerm (AAppl "Syntax"     [ aa ]) = let aa' = fromATerm aa in (Syntax     aa')
@@ -316,14 +316,14 @@ instance ATermConvertible Attribute where
     toATerm Bracket     = (AAppl "Bracket"     [ ])
     toATerm (Atr     aa) = (AAppl "Atr"     [ toATerm aa ])
     toATerm (Id     aa) = (AAppl "Id"     [ toATerm aa ])
-    fromATerm (AAppl "Reject"     [ ]) = let in Reject    
-    fromATerm (AAppl "Prefer"     [ ]) = let in Prefer    
-    fromATerm (AAppl "Avoid"     [ ]) = let in Avoid    
+    fromATerm (AAppl "Reject"     [ ]) = let in Reject
+    fromATerm (AAppl "Prefer"     [ ]) = let in Prefer
+    fromATerm (AAppl "Avoid"     [ ]) = let in Avoid
     fromATerm (AAppl "Cons1"     [ aa ]) = let aa' = fromATerm aa in (Cons1     aa')
-    fromATerm (AAppl "Constructor"     [ ]) = let in Constructor    
-    fromATerm (AAppl "Memo"     [ ]) = let in Memo    
-    fromATerm (AAppl "Traverse"     [ ]) = let in Traverse    
-    fromATerm (AAppl "Bracket"     [ ]) = let in Bracket    
+    fromATerm (AAppl "Constructor"     [ ]) = let in Constructor
+    fromATerm (AAppl "Memo"     [ ]) = let in Memo
+    fromATerm (AAppl "Traverse"     [ ]) = let in Traverse
+    fromATerm (AAppl "Bracket"     [ ]) = let in Bracket
     fromATerm (AAppl "Atr"     [ aa ]) = let aa' = fromATerm aa in (Atr     aa')
     fromATerm (AAppl "Id"     [ aa ]) = let aa' = fromATerm aa in (Id     aa')
     fromATerm u = fromATermError "Attribute" u
@@ -332,7 +332,7 @@ instance ATermConvertible OptExp where
     toATerm (Present     aa) = (AAppl "Present"     [ toATerm aa ])
     toATerm Absent     = (AAppl "Absent"     [ ])
     fromATerm (AAppl "Present"     [ aa ]) = let aa' = fromATerm aa in (Present     aa')
-    fromATerm (AAppl "Absent"     [ ]) = let in Absent    
+    fromATerm (AAppl "Absent"     [ ]) = let in Absent
     fromATerm u = fromATermError "OptExp" u
 
 instance ATermConvertible RealCon where
@@ -382,7 +382,7 @@ instance ATermConvertible Symbol where
     fromATerm (AAppl "Lit"     [ aa ]) = let aa' = fromATerm aa in (Lit     aa')
     fromATerm (AAppl "Sort"     [ aa ]) = let aa' = fromATerm aa in (Sort     aa')
     fromATerm (AAppl "CharClass1"      [ aa ]) = let aa' = fromATerm aa in (CharClass1      aa')
-    fromATerm (AAppl "Empty1"     [ ]) = let in Empty1    
+    fromATerm (AAppl "Empty1"     [ ]) = let in Empty1
     fromATerm (AAppl "Seq1"     [ aa,ab ]) = let aa' = fromATerm aa
 						 ab' = fromATerm ab in (Seq1     aa' ab')
     fromATerm (AAppl "Opt"     [ aa ]) = let aa' = fromATerm aa in (Opt     aa')
@@ -408,9 +408,9 @@ instance ATermConvertible Symbol where
     fromATerm (AAppl "Cf"     [ aa ]) = let aa' = fromATerm aa in (Cf     aa')
     fromATerm (AAppl "Lex"     [ aa ]) = let aa' = fromATerm aa in (Lex     aa')
     fromATerm (AAppl "Varsym"     [ aa ]) = let aa' = fromATerm aa in (Varsym     aa')
-    fromATerm (AAppl "Layout"     [ ]) = let in Layout    
-    fromATerm (AAppl "Start"     [ ]) = let in Start    
-    fromATerm (AAppl "FileStart"      [ ]) = let in FileStart     
+    fromATerm (AAppl "Layout"     [ ]) = let in Layout
+    fromATerm (AAppl "Start"     [ ]) = let in Start
+    fromATerm (AAppl "FileStart"      [ ]) = let in FileStart
     fromATerm u = fromATermError "Symbol" u
 
 instance ATermConvertible Literal where
@@ -441,10 +441,10 @@ instance ATermConvertible Character where
     toATerm LabelStart      = (AAppl "LabelStart"      [ ])
     fromATerm (AAppl "Numeric"     [ aa ]) = let aa' = fromATerm aa in (Numeric     aa')
     fromATerm (AAppl "Short"     [ aa ]) = let aa' = fromATerm aa in (Short     aa')
-    fromATerm (AAppl "Top"     [ ]) = let in Top    
-    fromATerm (AAppl "Eof"     [ ]) = let in Eof    
-    fromATerm (AAppl "Bot"     [ ]) = let in Bot    
-    fromATerm (AAppl "LabelStart"      [ ]) = let in LabelStart     
+    fromATerm (AAppl "Top"     [ ]) = let in Top
+    fromATerm (AAppl "Eof"     [ ]) = let in Eof
+    fromATerm (AAppl "Bot"     [ ]) = let in Bot
+    fromATerm (AAppl "LabelStart"      [ ]) = let in LabelStart
     fromATerm u = fromATermError "Character" u
 
 instance ATermConvertible CharRange where
@@ -466,7 +466,7 @@ instance ATermConvertible CharRanges where
 instance ATermConvertible OptCharRanges where
     toATerm Absent1     = (AAppl "Absent1"     [ ])
     toATerm (Present1     aa) = (AAppl "Present1"     [ toATerm aa ])
-    fromATerm (AAppl "Absent1"     [ ]) = let in Absent1    
+    fromATerm (AAppl "Absent1"     [ ]) = let in Absent1
     fromATerm (AAppl "Present1"     [ aa ]) = let aa' = fromATerm aa in (Present1     aa')
     fromATerm u = fromATermError "OptCharRanges" u
 
@@ -491,10 +491,10 @@ instance ATermConvertible Associativity where
     toATerm Right     = (AAppl "Right"     [ ])
     toATerm NonAssoc      = (AAppl "NonAssoc"      [ ])
     toATerm Assoc     = (AAppl "Assoc"     [ ])
-    fromATerm (AAppl "Left"     [ ]) = let in Left    
-    fromATerm (AAppl "Right"     [ ]) = let in Right    
-    fromATerm (AAppl "NonAssoc"      [ ]) = let in NonAssoc     
-    fromATerm (AAppl "Assoc"     [ ]) = let in Assoc    
+    fromATerm (AAppl "Left"     [ ]) = let in Left
+    fromATerm (AAppl "Right"     [ ]) = let in Right
+    fromATerm (AAppl "NonAssoc"      [ ]) = let in NonAssoc
+    fromATerm (AAppl "Assoc"     [ ]) = let in Assoc
     fromATerm u = fromATermError "Associativity" u
 
 instance ATermConvertible Group where
@@ -603,7 +603,7 @@ instance ATermConvertible Attributes where
     toATerm (Attrs     aa) = (AAppl "Attrs"     [ toATerm aa ])
     toATerm NoAttrs      = (AAppl "NoAttrs"      [ ])
     fromATerm (AAppl "Attrs"     [ aa ]) = let aa' = fromATerm aa in (Attrs     aa')
-    fromATerm (AAppl "NoAttrs"      [ ]) = let in NoAttrs     
+    fromATerm (AAppl "NoAttrs"      [ ]) = let in NoAttrs
     fromATerm u = fromATermError "Attributes" u
 
 instance ATermConvertible Productions where

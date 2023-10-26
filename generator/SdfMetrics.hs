@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Ralf Laemmel, Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -18,12 +18,12 @@ import System.IO
 
 --- SDF Metrics -------------------------------------------------------------
 
--- | Extract metrics from an SDF grammar.  
+-- | Extract metrics from an SDF grammar.
 sdfMetrics :: SDF -> Metrics
 sdfMetrics sdf
   = maybe initMetrics0 id (applyTU (full_tdTU atnode) sdf)
     where
-      atnode = failTU 
+      atnode = failTU
                `typeMetric` ("modules    ",  typeGuard :: TypeGuard Module)
                `typeMetric` ("productions",  typeGuard :: TypeGuard Production)
                `typeMetric` ("symbols    ",  typeGuard :: TypeGuard Symbol)
@@ -38,11 +38,11 @@ putSdfMetricsLns sdf
        putMetricLn "modules    " metrics
        putMetricLn "sorts      " metrics
        putMetricLn "productions" metrics
-       putMetricLn "symbols    " metrics    
+       putMetricLn "symbols    " metrics
 
 -- | Print value of metric with the given name.
 putMetricLn		:: MetricName -> Metrics -> IO ()
 putMetricLn key m 	=  hPutStrLn stderr $ key++" = "++show (m key)
- 
+
 
 -------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ import Monad
 
 --- For processing a single compilation unit per file ------------------------
 
-main 
+main
   = do errLn "\n == Computation of metrics for Java == \n"
        args <- getArgs
        cus <- javaChaseImports ["."] args
@@ -43,19 +43,19 @@ writeXml = fWriteXml "-"
 statementCounter :: (Term t, Monad m) => t -> m Int
 statementCounter cus
   = applyTU (full_tdTU worker) cus
-    where 
+    where
       worker
         = constTU 0 `adhocTU` stat
                   `adhocTU` localVarDecStat
 
       stat s = case s of
-                 (StatementWithoutTrailingSubstatement (EmptyStatement _)) 
+                 (StatementWithoutTrailingSubstatement (EmptyStatement _))
                                     -> return 0
-                 (StatementWithoutTrailingSubstatement (Block _)) 
+                 (StatementWithoutTrailingSubstatement (Block _))
                                     -> return 0
                  (LabeledStatement _)
                                     -> return 0
-                 (ClassDeclaration _) 
+                 (ClassDeclaration _)
                                     -> return 0
                  _                  -> return 1
 
@@ -76,7 +76,7 @@ nestingDepth cus
 --- Reusable recogniser for Java conditionals --------------------------------
 
 isConditional :: MonadPlus m => TU () m
-isConditional 
+isConditional
   = failTU
             `adhocTU` (\(_::IfThenStatement)     -> return ())
             `adhocTU` (\(_::IfThenElseStatement) -> return ())
@@ -107,7 +107,7 @@ mcCabeIndex cus
 
 extractJavaMetrics cus
   = do cuMetrics <- mapM extractCuMetrics cus
-       return $ JavaMetrics cuMetrics 
+       return $ JavaMetrics cuMetrics
 
 extractCuMetrics (CU _ _ types)
   = do let classes   =  getClasses types
@@ -135,16 +135,16 @@ extractClassMetrics (Class1 _ name extends implements body)
          ClassMetric
            ClassMetric_Attrs {
              classMetricName       = str2cdata name,
-             classMetricFieldCount = int2cdata fieldCount } 
+             classMetricFieldCount = int2cdata fieldCount }
            ( (map ClassMetric_ClassMetric nestedClassMetrics)
-             ++ 
+             ++
              (map ClassMetric_MethodMetric methodMetrics) )
     where
       getFields (ClassBodyDeclaration_s decls)
         = map unField (filter isField decls)
-      isField (ClassMemberDeclaration (FieldDeclaration1 fd)) = True 
+      isField (ClassMemberDeclaration (FieldDeclaration1 fd)) = True
       isField _                                               = False
-      unField (ClassMemberDeclaration (FieldDeclaration1 fd)) = fd 
+      unField (ClassMemberDeclaration (FieldDeclaration1 fd)) = fd
       unField _ = error "Hoepla"
 
       getNestedClasses (ClassBodyDeclaration_s decls)
@@ -156,9 +156,9 @@ extractClassMetrics (Class1 _ name extends implements body)
 
       getMethods (ClassBodyDeclaration_s decls)
         = map unMethod (filter isMethod decls)
-      isMethod (ClassMemberDeclaration (MethodDeclaration md)) = True 
+      isMethod (ClassMemberDeclaration (MethodDeclaration md)) = True
       isMethod _                                               = False
-      unMethod (ClassMemberDeclaration (MethodDeclaration md)) = md 
+      unMethod (ClassMemberDeclaration (MethodDeclaration md)) = md
       unMethod _ = error "Hela"
 
 
@@ -172,7 +172,7 @@ extractMethodMetrics (MethodHeader_MethodBody header body)
        nestedClasses      <- getNestedClasses body
        nestedClassMetrics <- mapM extractClassMetrics nestedClasses
        return $
-         MethodMetric 
+         MethodMetric
            MethodMetric_Attrs {
              methodMetricName           = str2cdata name,
              methodMetricStatementCount = int2cdata statCount,
@@ -195,9 +195,9 @@ str2cdata :: String -> CDATA
 str2cdata s = s
 
 int2cdata :: Int -> CDATA
-int2cdata i = show i 
+int2cdata i = show i
 
-    
+
 
 --- Extract method name from its header --------------------------------------
 
@@ -222,7 +222,7 @@ visualizeJavaMetrics m
 visualizeMetrics :: (Term t, MonadPlus m) => String -> t -> m [DotElement]
 visualizeMetrics parent m
   = applyTU (stop_tdTU worker) m
-    where 
+    where
       worker = failTU `adhocTU` method
                       `adhocTU` clss
 
@@ -247,10 +247,10 @@ visualizeMetrics parent m
 
 --- dot API ------------------------------------------------------------------
 
-data DotElement 
-  = DotNode { 
-      label  :: String, 
-      shape  :: String, 
+data DotElement
+  = DotNode {
+      label  :: String,
+      shape  :: String,
       height :: Int }
   | DotEdge {
       source :: String,

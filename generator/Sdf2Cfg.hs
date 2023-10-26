@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -11,7 +11,7 @@
 ------------------------------------------------------------------------------
 
 module Sdf2Cfg --( --genCfgDecl
---) 
+--)
 where
 
 import Data.Char
@@ -54,24 +54,24 @@ instance (ATermConvertible t,
 
 completeCfg :: [CfgProd] -> ([Symb Char String],[Symb Char String])
 completeCfg ps = (nub (filter (not.(`elem` defined)) used),nub (filter (not.(`elem` used)) defined))
-	where 
+	where
           defined = map (lhs_prod.snd) ps
           used    = concat $ map ((filter isNT).rhs_prod.snd) ps
           isNT (NT _) = True
           isNT _ = False
 
 ensureComplete ps = case completeCfg ps of ([],[NT "<Start>"]) -> ps
-					   x       -> error $ show x  
+					   x       -> error $ show x
 
 ------------------------------------------------------------------------------
--- * Starting point 
+-- * Starting point
 
 type CfgProd  = Prod Char String
 type CfgSymb  = Symb Char String
 
 
 genCfgDecl :: SDF -> [CfgProd]
-genCfgDecl sdf 
+genCfgDecl sdf
   = ensureComplete $ nub $ (map sdfprod2cfgprod ps)++rangesPs
     where
       ps   = collectProductions nsdf
@@ -104,20 +104,20 @@ ranges2Chars (Sdf_conc crs1 crs2) = ranges2Chars crs1 ++ ranges2Chars crs2
 
 
 ranges2prods :: CharRanges -> [CfgProd]
-ranges2prods crs 
+ranges2prods crs
   = [("PRODNAME",[NT (showSdf crs),T c]) | c <- ranges2Chars crs ]
 
-sdfprod2cfgprod :: Production -> CfgProd 
-sdfprod2cfgprod prod 
+sdfprod2cfgprod :: Production -> CfgProd
+sdfprod2cfgprod prod
 	= (name, nt:syms)
-	where 
+	where
 	name = maybe pname  id $ getConsAttr (getAttributes prod)
 	nt   = sort2nt $ getSort prod
         symbols = getSyms prod
 	syms = map symbol2sym symbols
 	filterChars = filter (\x -> not (x `elem` ['<','>','\\','"','?','_']))
-	pname = filterChars (showSymb nt) ++ " -- " ++ filterChars (concatMap showSymb syms) 
-	
+	pname = filterChars (showSymb nt) ++ " -- " ++ filterChars (concatMap showSymb syms)
+
 
 sort2nt :: Symbol -> CfgSymb
 sort2nt = NT . showSdf
@@ -133,9 +133,9 @@ symbol2sym :: Symbol -> CfgSymb
 symbol2sym s
   = s2t s
     where
-      s2t (Sdf_char_class1 (Sdf_simple_charclass (Sdf_present1 (Sdf_CharRange (Sdf_Character i))))) 
+      s2t (Sdf_char_class1 (Sdf_simple_charclass (Sdf_present1 (Sdf_CharRange (Sdf_Character i)))))
         = T $ sdfChar2t i
-      s2t (Sdf_char_class1 (Sdf_simple_charclass (Sdf_present1 r))) 
+      s2t (Sdf_char_class1 (Sdf_simple_charclass (Sdf_present1 r)))
         = NT $ (showSdf r)
       s2t x                         = sort2nt x
 
@@ -146,7 +146,7 @@ genSyntaxDecls sdf
     (genTypeDecls sdf)
 
 ------------------------------------------------------------------------------
--- * Generate type synonyms from lexical sorts 
+-- * Generate type synonyms from lexical sorts
 
 -- | Generate Haskell type declarations for all lexical sorts defined
 --   in a given SDF grammar.
@@ -156,9 +156,9 @@ genTypeDecls sdf
 
 -- | Convert a lexical SDF sort to a Haskell type synonym.
 sort2typedecl :: Symbol -> [HsDecl]
-sort2typedecl (Sdf_sort str) 
+sort2typedecl (Sdf_sort str)
   = [HsTypeDecl noLoc (HsIdent str) [] (mkTyCon "String")]
-sort2typedecl _              
+sort2typedecl _
   = []
 
 ------------------------------------------------------------------------------
@@ -179,14 +179,14 @@ production2datadecl :: Production -> Maybe HsDecl
 production2datadecl prod
   = production2decl mkDecl prod
     where
-      mkDecl typename consname symbols  
+      mkDecl typename consname symbols
         = mkHsDataDecl typename consname (symbols2types symbols)
       mkHsDataDecl hsname str ts
-        = HsDataDecl noLoc [] hsname [] 
+        = HsDataDecl noLoc [] hsname []
             [HsConDecl noLoc (HsIdent str) ts] []
 
 
--- | Convert Sdf symbols to Haskell types. 
+-- | Convert Sdf symbols to Haskell types.
 symbols2types :: [Symbol] -> [HsBangType]
 symbols2types symbols
   = concatMap symbol2bangtype symbols
@@ -202,7 +202,7 @@ symbol2bangtype s
       s2t (Sdf_label l s)	    = s2t s
       s2t (Sdf_lit l)		    = []
       s2t (Sdf_sort s)		    = [mkTyCon s]
-      s2t (Sdf_seq1 s ss)	    = do t  <- s2t s 
+      s2t (Sdf_seq1 s ss)	    = do t  <- s2t s
             			         ts <- [concatMap s2t ss]
 				         [HsTyTuple (t:ts)]
       s2t (Sdf_opt s)		    = let s' = do t <- s2t s

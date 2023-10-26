@@ -61,7 +61,7 @@ instance XmlAttributes CuMetric_Attrs where
 	CuMetric_Attrs
 	  { cuMetricName = definiteA fromAttrToStr "cuMetric" "name" as
 	  }
-    toAttrs v = catMaybes 
+    toAttrs v = catMaybes
 	[ toAttrFrStr "name" (cuMetricName v)
 	]
 instance XmlContent CuMetric_ where
@@ -89,7 +89,7 @@ instance XmlAttributes InterfaceMetric where
 	  , interfaceMetricMethodCount = definiteA fromAttrToStr "interfaceMetric" "methodCount" as
 	  , interfaceMetricFieldCount = definiteA fromAttrToStr "interfaceMetric" "fieldCount" as
 	  }
-    toAttrs v = catMaybes 
+    toAttrs v = catMaybes
 	[ toAttrFrStr "name" (interfaceMetricName v)
 	, toAttrFrStr "methodCount" (interfaceMetricMethodCount v)
 	, toAttrFrStr "fieldCount" (interfaceMetricFieldCount v)
@@ -108,7 +108,7 @@ instance XmlAttributes ClassMetric_Attrs where
 	  { classMetricName = definiteA fromAttrToStr "classMetric" "name" as
 	  , classMetricFieldCount = definiteA fromAttrToStr "classMetric" "fieldCount" as
 	  }
-    toAttrs v = catMaybes 
+    toAttrs v = catMaybes
 	[ toAttrFrStr "name" (classMetricName v)
 	, toAttrFrStr "fieldCount" (classMetricFieldCount v)
 	]
@@ -140,7 +140,7 @@ instance XmlAttributes MethodMetric_Attrs where
 	  , methodMetricMcCabe = definiteA fromAttrToStr "methodMetric" "mcCabe" as
 	  , methodMetricNestingDepth = definiteA fromAttrToStr "methodMetric" "nestingDepth" as
 	  }
-    toAttrs v = catMaybes 
+    toAttrs v = catMaybes
 	[ toAttrFrStr "name" (methodMetricName v)
 	, toAttrFrStr "statementCount" (methodMetricStatementCount v)
 	, toAttrFrStr "mcCabe" (methodMetricMcCabe v)

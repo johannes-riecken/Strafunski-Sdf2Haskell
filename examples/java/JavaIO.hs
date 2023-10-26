@@ -14,14 +14,14 @@ javaIOwrap mtransform
        sin  <- mapM readJavaFile args
        tin  <- mapM (return . fromATerm . afunCap . readATerm . dehyphen) sin
        sout <- mtransform tin
-       putStrLn sout 
-       
+       putStrLn sout
+
 split p [] 	= ([],[])
-split p (a:as) 
+split p (a:as)
   | p a 	= (a:xs,ys)
-  | otherwise	= (xs,a:ys) 
+  | otherwise	= (xs,a:ys)
   where (xs,ys) = split p as
-  
+
 isFlag ('-':_)	= True
 isFlag _        = False
 

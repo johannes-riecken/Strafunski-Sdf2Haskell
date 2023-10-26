@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -56,7 +56,7 @@ dumpProductions tableName = do
   let asfixName = newName++".asfix"
   let cmd = "dump-productions "++tableName++" > "++asfixName
   progName <- getProgName
-  errLn $ "["++progName++"] "++cmd                      
+  errLn $ "["++progName++"] "++cmd
   exitOK $ system cmd
   asfix <- readFile asfixName
   let ps = map (readATerm . dropWhile isSpace . dropWhile (not . isSpace)) $ lines asfix
@@ -70,9 +70,9 @@ filterRejects prods
       isReject (AAppl "prod" [_,_,AAppl "attrs" [AList [AAppl "reject" []]]]) = True
       isReject _ = False
 
--- | Analyze coverage for a single file, add the result to the cummulative result, 
+-- | Analyze coverage for a single file, add the result to the cummulative result,
 --   and give an intermediate cummulative report.
-cummulativeCoverage :: FilePath -> String -> Set ATerm 
+cummulativeCoverage :: FilePath -> String -> Set ATerm
                     -> Bag ATerm -> FilePath -> IO (Bag ATerm)
 cummulativeCoverage tableFile sortName prods accu f = do
   b <- coverage1 tableFile f sortName
@@ -85,13 +85,13 @@ cummulativeCoverage tableFile sortName prods accu f = do
     return accu
 
 -- | Determine coverage for a single term, by parsing it and producing
---   a bag that holds usage counts for each occuring production.  
+--   a bag that holds usage counts for each occuring production.
 coverage1 :: FilePath -> FilePath -> String -> IO (Bag ATerm)
 coverage1 tableFile termFile sortName = do
   progName <- getProgName
   parseTree <- sglr' tableFile termFile sortName
-  if (length $ show parseTree) < 0 
-    then errLn $ "["++progName++"] *** NO PARSE *** " 
+  if (length $ show parseTree) < 0
+    then errLn $ "["++progName++"] *** NO PARSE *** "
     else errLn $ "["++progName++"] Parsing completed"
 {-
   return $ collectProdBag parseTree
@@ -99,8 +99,8 @@ coverage1 tableFile termFile sortName = do
   let result = collectProdBag parseTree
   if result==result
     then return result
-    else return $ error "CANNOT HAPPEN"  
-  
+    else return $ error "CANNOT HAPPEN"
+
 -- | Collect all productions from a given aterm, and return them in a list.
 collectProds :: ATerm -> [ATerm]
 collectProds t = worker t []
@@ -147,12 +147,12 @@ foldl' f a (x:xs) = (foldl' f $! f a x) xs
 -- * Reporting results
 
 reportFile :: Set ATerm -> FilePath -> IO ()
-reportFile unusedProds outputFile = do  
+reportFile unusedProds outputFile = do
   progName <- getProgName
   let content = unlines $ map unparseProd $ Set.toList unusedProds
   writeFile outputFile content
   errLn $ "["++progName++"] Unused productions written to file: "++outputFile
-  
+
 reportErrLong :: Set ATerm -> Bag ATerm -> IO ()
 reportErrLong prods prodBag = do
   progName <- getProgName
@@ -197,11 +197,11 @@ convertProd = fromATerm . prefixAppls "Sdf_" . explodeSymbols . dehyphenAST
 
 -- | Helper to deal with irregularities between AsFix versions.
 explodeSymbols :: ATerm -> ATerm
-explodeSymbols (AAppl "prod" [AList ts, s, as]) 
-  = AAppl "prod" [AAppl "list7" [ AList $ map explodeSymbols ts], 
-                                  (explodeSymbols s), 
+explodeSymbols (AAppl "prod" [AList ts, s, as])
+  = AAppl "prod" [AAppl "list7" [ AList $ map explodeSymbols ts],
+                                  (explodeSymbols s),
                                   (explodeSymbols as)]
-explodeSymbols (AAppl "lit" [AAppl f []]) 
+explodeSymbols (AAppl "lit" [AAppl f []])
   = AAppl "lit" [AAppl "quoted" [AAppl (show f) []]]
 explodeSymbols (AAppl "assoc" [t])
   = AAppl "atr" [t]
@@ -214,9 +214,9 @@ explodeSymbols (AAppl "char_class" [AList [r]])
 explodeSymbols (AAppl "char_class" [AList rs])
   = AAppl "char_class1" [
       AAppl "simple_charclass" [
-        AAppl "present1" 
+        AAppl "present1"
           [foldr1 (\r1 r2 -> AAppl "conc" [r1,r2]) (map explodeCharRange rs)]]]
-explodeSymbols (AAppl "seq" [AList (t:ts)]) 
+explodeSymbols (AAppl "seq" [AList (t:ts)])
   = AAppl "seq1" [
       explodeSymbols t,
       AList (map explodeSymbols ts) ]
@@ -280,9 +280,9 @@ sglr' tableName termName sortName
        let baffleCmd = "baf2taf < "++bafName++
                               " > "++tafName
        progName <- getProgName
-       errLn $ "["++progName++"] "++sglrCmd                      
+       errLn $ "["++progName++"] "++sglrCmd
        exitOK $ system sglrCmd
-       errLn $ "["++progName++"] "++baffleCmd                      
+       errLn $ "["++progName++"] "++baffleCmd
        exitOK $ system baffleCmd
        asfix <- readFile tafName
        let aterm = readATerm $ asfix
@@ -298,20 +298,20 @@ main = do
   (flags,trailingArgs) <- cmdLine args
   let reqArgs = reqArgsFromFlags flags
   case reqArgs of
-    (Nothing)      -> putStr cmdUsageInfo 
+    (Nothing)      -> putStr cmdUsageInfo
     (Just (t,s,r)) -> sdfCoverage t trailingArgs s r
 
 -- | Command line flags.
-data Flag 
-  = ParseTable String 
+data Flag
+  = ParseTable String
   | StartSymbol String
   | ReportFile String
   | Help
   deriving (Eq, Show)
-  
+
 -- | Option descriptions for command line flags.
 options :: [OptDescr Flag]
-options = 
+options =
 	[ Option ['p'] ["table"] (ReqArg ParseTable "Parse Table") "Parse Table"
 	, Option ['s'] ["symbol"] (ReqArg StartSymbol "Start Symbol") "Start Symbol"
 	, Option ['o'] ["report"] (ReqArg ReportFile "Report") "Report"
@@ -320,7 +320,7 @@ options =
 
 -- | Process the command line arguments into flags and remaining arguments.
 cmdLine :: [String] -> IO ([Flag], [String])
-cmdLine argv = 
+cmdLine argv =
 	case (getOpt RequireOrder options argv) of
 		(o, n, []) -> return (o,n)
 		(_,_,errs) -> cmdLineError errs
@@ -338,7 +338,7 @@ cmdUsageInfo = usageInfo header options
 reqArgsFromFlags :: [Flag] -> Maybe (FilePath,String,FilePath)
 reqArgsFromFlags flags
   = case (justFilter unT flags,justFilter unS flags,justFilter unR flags) of
-      ([t],[s],[r]) 
+      ([t],[s],[r])
          -> Just (t,s,r)
       _  -> Nothing
     where
@@ -352,17 +352,17 @@ reqArgsFromFlags flags
 -- | Utility function.
 justFilter :: (a -> Maybe b) -> [a] -> [b]
 justFilter f [] = []
-justFilter f (a:as) 
+justFilter f (a:as)
   = case (f a) of
       Nothing    -> justFilter f as
-      (Just b)   -> (b:justFilter f as) 
+      (Just b)   -> (b:justFilter f as)
 
 ------------------------------------------------------------------------------
 -- * Tests
 
 test :: IO ()
 test =
-  sdfCoverage 
+  sdfCoverage
     "../examples/littlelambda/LittleLambda.tbl"
     ["../examples/littlelambda/ex1.expr",
      "../examples/littlelambda/ex2.expr",
@@ -370,10 +370,10 @@ test =
      "../examples/littlelambda/Makefile"]
     "Expr"
     "coverage-report"
-    
+
 testJava :: IO ()
 testJava =
-  sdfCoverage 
+  sdfCoverage
     "../examples/java/Java.tbl"
     ["../examples/java/Hoi.java",
      "../examples/java/Hello.java",
@@ -411,12 +411,12 @@ listToBag xs
 
 -- | Create the union of a list of bags.
 unionBags :: Ord a => [Bag a] -> Bag a
-unionBags bags = 
+unionBags bags =
   Bag $ foldr (Map.unionWith (+)) Map.empty $ map fm bags
-  
+
 -- | Create the union of two bags.
 unionBag :: Ord a => Bag a -> Bag a -> Bag a
-unionBag b1 b2 = 
+unionBag b1 b2 =
   Bag $ Map.unionWith (+) (fm b1) (fm b2)
 
 ------------------------------------------------------------------------------

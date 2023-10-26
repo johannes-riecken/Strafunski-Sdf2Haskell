@@ -27,7 +27,7 @@ getProgramName :: (MonadPlus m, Term x) => x -> m String
 getProgramName
   = applyTU (once_tdTU (failTU `adhocTU` (return . worker)))
     where
-      worker (Program_name udw) 
+      worker (Program_name udw)
         = user_defined_word2string udw
 
 getSectionName :: Section_with_header -> String
@@ -37,14 +37,14 @@ getSectionName (Section_with_header header _)
 section_header2string :: Section_header -> String
 section_header2string (Section_header sn _)
   = section_name2string sn
-  
+
 getParagraphName (Paragraph_1 (Paragraph_11 pname _))
-  = paragraph_name2string pname  
+  = paragraph_name2string pname
 getParagraphName (Altered_goto (Altered_goto1 pname _))
-  = paragraph_name2string pname  
+  = paragraph_name2string pname
 
 
-  
+
 -- Collect performed labels and ranges ---------------------------------------
 
 visitPerform (Perform_statement Nothing _ _ _ _ ) = return []
@@ -68,7 +68,7 @@ findInvocations
 
 -- Create perform edges -------------------------------------------------------
 
-findPerformsPerProc :: (MonadPlus m, Term t)  
+findPerformsPerProc :: (MonadPlus m, Term t)
                     => [(String, Maybe String)] -> t -> m [DotEdge]
 
 findPerformsPerProc labels
@@ -76,9 +76,9 @@ findPerformsPerProc labels
     where
       worker = constTU [] `adhocTU` visitParagraph
                           `adhocTU` visitParagraphList
-                          `adhocTU` visitSection 
+                          `adhocTU` visitSection
                           `adhocTU` visitSectionList
-	     
+
       visitParagraph (Paragraph_11 pname sentences)
         = do name <- return (paragraph_name2string pname)
              refineProc labels name sentences
@@ -192,11 +192,11 @@ mkPerf n (p,Just q)  = (quote n)++" -> "++(quote (mkRangeName p q))++"\n"
 mkRangeName p q      = p++".."++q
 
 quote n = "\""++n++"\""
-  
+
 
 
 -- Debugging helpers ---------------------------------------------------------
 
-errLn msg = hPutStrLn stderr msg  
-  
+errLn msg = hPutStrLn stderr msg
+
 ------------------------------------------------------------------------------

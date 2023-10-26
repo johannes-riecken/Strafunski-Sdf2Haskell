@@ -2,7 +2,7 @@
 -- |
 -- Copyright   :  (c) Universidade do Minho, 2004
 -- License     :  LGPL
--- 
+--
 -- Maintainer  :  João Saraiva - jas@di.uminho.pt
 -- Stability   :  experimental
 -- Portability :  portable
@@ -37,7 +37,7 @@ type Prod t nt = (ProdName, [Symb t nt])
 type ProdName = String
 
 
-data Symb t nt 
+data Symb t nt
 	     = Dollar   -- ^ End of input
              | Root     -- ^ Root symbol
              | T t      -- ^ Terminal symbol
@@ -54,7 +54,7 @@ showSymb (T sy) = show sy    -- todo: filtering for graphviz
 showSymb (NT sy) = show sy    -- todo: filtering for graphviz
 
 
--- | To make the notation of the grammars as similar to BNF as possible 
+-- | To make the notation of the grammars as similar to BNF as possible
 --   we define an infix operator to denote the usual 'derives to' operator
 
 (|->) :: a -> [a] -> [a]
@@ -63,12 +63,12 @@ l |-> r = l : r
 ------------------------------------------------------------------------------
 -- * Access functions
 
--- | The left-hand side and th right-hand side of a prodution are easily 
+-- | The left-hand side and th right-hand side of a prodution are easily
 --   defined by the 'head' and 'tail' functions
 
 lhs_prod :: [Symb t nt] -> Symb t nt
 lhs_prod (NT nt:_) = NT nt
-lhs_prod (Root:_)  = Root 
+lhs_prod (Root:_)  = Root
 lhs_prod p = error $ "LHS of the production not a non-terminal" -- ++ show p
 
 rhs_prod :: [Symb t nt] -> RHS t nt
@@ -79,12 +79,12 @@ rhs_prod = tail
 
 -- | Computes the length of a prodution: the number of symbols on its right-hand side
 
-sizeProd :: [Symb t nt] -> Int 
+sizeProd :: [Symb t nt] -> Int
 sizeProd p = length p - 1
 
 
 -- | Checks whether a terminal is  declared as such in a grammar
-is_terminal :: (Eq t,Eq nt) => Symb t nt -> Cfg t nt -> Bool 
+is_terminal :: (Eq t,Eq nt) => Symb t nt -> Cfg t nt -> Bool
 is_terminal t g = t `elem` (terminals g)
 
 
@@ -117,17 +117,17 @@ elemT t rhs = T t `elem` rhs
 
 elemNT :: (Eq t,Eq nt) =>  Symb t nt -> RHS t nt -> Bool
 elemNT nt rhs = or (map isNT rhs)
-  where 
+  where
     isNT nt' = nt' == nt
 
 ------------------------------------------------------------------------------
 -- * Advanced queries on grammars
 
--- | Verifies whther a sequence of symbols derives in the empty strig or not. 
+-- | Verifies whther a sequence of symbols derives in the empty strig or not.
 
-nullable :: (Eq t,Eq nt) 
+nullable :: (Eq t,Eq nt)
          => Cfg t nt      -- ^ Grammar
-         -> [Symb t nt]        -- ^ Accumulator: non-terminals visited so far. 
+         -> [Symb t nt]        -- ^ Accumulator: non-terminals visited so far.
          -> [Symb t nt]        -- ^ List of grammar symbols (from RHS)
          -> Bool
 nullable g _ []    = True
@@ -136,26 +136,26 @@ nullable g v (nt:t) | nt `elem` v = False
                     | otherwise   = (nullable_nt' g (nt:v) nt) && (nullable g (nt:v) t)
 
 nullable_nt' :: (Eq t,Eq nt) => Cfg t nt -> [Symb t nt] -> Symb t nt -> Bool
-nullable_nt' g v nt = or $ map (nullable g v) (rhs_nt g nt) 
+nullable_nt' g v nt = or $ map (nullable g v) (rhs_nt g nt)
 
-nullable_nt :: (Eq t,Eq nt) => Cfg t nt -> Symb t nt -> Bool 
+nullable_nt :: (Eq t,Eq nt) => Cfg t nt -> Symb t nt -> Bool
 nullable_nt g nt = nullable_nt' g [] nt
 
 
 -- | Computes the set of terminal symbols that begin the strings derived from the given
 --   sequence of symbols
 
-first :: (Eq t, Eq nt) 
+first :: (Eq t, Eq nt)
       => Cfg t nt      -- ^ Grammar
       -> RHS t nt      -- ^ Sequence of grammar symbols
-      -> [Symb t nt]           -- ^ 'first' set 
+      -> [Symb t nt]           -- ^ 'first' set
 first g sy = first' g [] sy
 
 
 -- | Computes the set of terminal symbols that begin the strings derived from the given
 --   nonterminal symbol
 
-first_N :: (Eq nt, Eq t) 
+first_N :: (Eq nt, Eq t)
         => Cfg t nt                -- ^ Grammar
         -> Symb t nt               -- ^ Nonterminal symbol
         -> [Symb t nt]                     -- ^ 'first' set
@@ -165,36 +165,36 @@ first_N g nt = nub $ concat $ map (first g) (rhs_nt g nt)
 
 first' :: (Eq t, Eq nt) => Cfg t nt -> [Symb t nt] -> RHS t nt -> [Symb t nt]
 first' g _ []                        = []
-first' g v (h:t) | h `is_terminal` g = [h] 
+first' g v (h:t) | h `is_terminal` g = [h]
                  | h `elem` v        = first' g v t
                  | nullable_nt g h   = (first' g (h:v) t) ++ (concat (map (first' g (h:v)) (rhs_nt g h)))
                  | otherwise         = concat $  map (first' g (h:v)) (rhs_nt g h)
 
 
 
--- | Computes the set of terminal symbols that can appear immediately to the 
+-- | Computes the set of terminal symbols that can appear immediately to the
 --   right of a given nonterminal symbol in some sentential form
 
-follow :: (Eq t, Eq nt) 
+follow :: (Eq t, Eq nt)
        => Cfg t nt        -- ^ Grammar
        -> Symb t nt              -- ^ Nonterminal symbol
        -> [Symb t nt]             -- ^ 'follow' set
 follow g nt = follow' g [] nt
 
 follow' :: (Eq t, Eq nt) => Cfg t nt -> [Symb t nt] -> Symb t nt -> [Symb t nt]
-follow' g v nt | nt `elem` v = [] 
+follow' g v nt | nt `elem` v = []
                | otherwise   = all_suffices
   where all_suffices = follow_prods_with_nt g (nt:v) nt (prods_rhs_with_nt g nt)
 
 follow_prods_with_nt :: (Eq t, Eq nt) => Cfg t nt -> [Symb t nt] -> Symb t nt -> [[Symb t nt]] -> [Symb t nt]
-follow_prods_with_nt g v nt l = nub $ concat $ map (suffices_after_sy g v nt) l 
+follow_prods_with_nt g v nt l = nub $ concat $ map (suffices_after_sy g v nt) l
 
 suffices_after_sy :: (Eq t, Eq nt) => Cfg t nt -> [Symb t nt] -> Symb t nt -> [Symb t nt] -> [Symb t nt]
 suffices_after_sy g v sy p = suffices_after_sy' g sy rhs
-  where 
+  where
         lhs = lhs_prod p
 	rhs = rhs_prod p
-        suffices_after_sy' g sy []    = [] 
+        suffices_after_sy' g sy []    = []
         suffices_after_sy' g sy (NT h:t) | sy == (NT h)   = f g v lhs t ++ (suffices_after_sy' g sy t)
                                          | otherwise = suffices_after_sy' g sy t
         suffices_after_sy' g sy (T h:t)  = suffices_after_sy' g sy t
@@ -205,15 +205,15 @@ f g v lhs rhs | nullable g [] rhs  = first g rhs ++ follow' g v lhs
               | otherwise          = first g rhs
 
 
--- | Computes the set of terminal symbols that begins the strings derived 
+-- | Computes the set of terminal symbols that begins the strings derived
 --   from the given production
 
-lookahead :: (Eq t, Eq nt) 
+lookahead :: (Eq t, Eq nt)
           => Cfg t nt        -- ^ Grammar
           -> [Symb t nt]       -- ^ Production
           -> [Symb t nt]             -- ^ 'lookahead' set
 lookahead g p | nullable g [] (rhs_prod p) = nub $ first g (rhs_prod p) ++ follow g  (lhs_prod p)
-              | otherwise                  = nub $ first g (rhs_prod p) 
+              | otherwise                  = nub $ first g (rhs_prod p)
 
 
 all_lookaheads :: (Eq t, Eq nt)
@@ -222,8 +222,8 @@ all_lookaheads :: (Eq t, Eq nt)
 all_lookaheads g = map (lookahead g) (map snd (prods g))
 
 
--- | Computes the lookahead set of a nonterminal symbols, that is the union of 
---   the lookaheads of the productions with this nonterminal symbol as 'lhs' 
+-- | Computes the lookahead set of a nonterminal symbols, that is the union of
+--   the lookaheads of the productions with this nonterminal symbol as 'lhs'
 
 lookaheads_nt :: (Eq t, Eq nt)
               => Cfg t nt      -- ^ Grammar
@@ -275,7 +275,7 @@ ex2 = Cfg [T 'a',T 'b',T 'c']
           [NT 'A',NT 'B',NT 'C',NT 'D']
           (NT 'A')
           [ ("p0",NT 'A' |-> [NT 'A'])
-          , ("p1",NT 'A' |-> [NT 'B', NT 'D'])        
+          , ("p1",NT 'A' |-> [NT 'B', NT 'D'])
           , ("p2",NT 'A' |-> [T 'c'])
           , ("p3",NT 'B' |-> [NT 'A'])
           , ("p4",NT 'B' |-> [NT 'C'])

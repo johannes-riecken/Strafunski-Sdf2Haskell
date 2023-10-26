@@ -1,5 +1,5 @@
------------------------------------------------------------------------------- 
--- | 
+------------------------------------------------------------------------------
+-- |
 -- Maintainer	: Joost Visser
 -- Stability	: experimental
 -- Portability	: portable
@@ -61,7 +61,7 @@ mkInfixApp e op es
 noLoc :: SrcLoc
 noLoc = SrcLoc "" 0 0
 
--- | Construct a list of import declarations, given the names of the 
+-- | Construct a list of import declarations, given the names of the
 --   modules to be imported.
 mkImports :: [String] -> [HsImportDecl]
 mkImports moduleNames
@@ -87,8 +87,8 @@ mergeDataDecls ds
     where merge []     ds' = ds'
           merge (d:ds) ds' = merge ds (merge1 d ds')
           merge1 d []      = [d]
-          merge1 (HsDataDecl _ _ name' _ cds' _) 
-                 (HsDataDecl l c name ns cds qns:ds)      
+          merge1 (HsDataDecl _ _ name' _ cds' _)
+                 (HsDataDecl l c name ns cds qns:ds)
             | name'==name
             = (HsDataDecl l c name ns (cds++cds') qns:ds)
           merge1 d (d':ds) = d':(merge1 d ds)
@@ -104,8 +104,8 @@ mergeDecls merge1 ds
 --   a list of declarations. Can be used as first argument for
 --   'mergeDecls'.
 mergeDataDecl d []	 = [d]
-mergeDataDecl (HsDataDecl _ _ name' _ cds' _) 
-              (HsDataDecl l c name ns cds qns:ds)	
+mergeDataDecl (HsDataDecl _ _ name' _ cds' _)
+              (HsDataDecl l c name ns cds qns:ds)
   | name'==name
   = (HsDataDecl l c name ns (cds++cds') qns:ds)
 mergeDataDecl d (d':ds) = d':(mergeDataDecl d ds)
@@ -114,8 +114,8 @@ mergeDataDecl d (d':ds) = d':(mergeDataDecl d ds)
 --   a list of declarations. Can be used as first argument for
 --   'mergeDecls'.
 mergeInstDecl d []	 = [d]
-mergeInstDecl (HsInstDecl _ _ name' ts' fds') 
-              (HsInstDecl l c name  ts  fds:ds)	
+mergeInstDecl (HsInstDecl _ _ name' ts' fds')
+              (HsInstDecl l c name  ts  fds:ds)
   | name'==name && ts'==ts
   = (HsInstDecl l c name ts (fds++fds'):ds)
 mergeInstDecl d (d':ds) = d':(mergeInstDecl d ds)

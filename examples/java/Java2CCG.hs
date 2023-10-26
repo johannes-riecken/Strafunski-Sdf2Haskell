@@ -22,7 +22,7 @@ main
   = do errLn "\n == Generation of Conditional Call Graph for Java == \n"
        javaIOwrap javax
        errLn "\n == Done. ==\n"
-  
+
 --- CCG generation -----------------------------------------------------------
 
 javax :: [CompilationUnit] -> IO String
@@ -33,7 +33,7 @@ javax cu
 -- Use a name supply to generate unique node names
 -- Basically follows the Propagage design pattern, where the
 --   name of the parent node is the environment.
-       
+
 java2ccg :: (Term a, Monad m) => String -> a -> StateT Integer m String
 java2ccg parent x
   = applyTU worker x
@@ -47,10 +47,10 @@ java2ccg parent x
 		 `adhocTU` if2ccg1
 		 `adhocTU` if2ccg2
 		 `adhocTU` if2ccg3
-      class2ccg (Class1 _ ident _ _ body) 
+      class2ccg (Class1 _ ident _ _ body)
              = do edges <- java2ccg ident body
 	          return ((mkNode ident)++(mkEdge parent ident)++edges)
-      method2ccg (MethodHeader_MethodBody header body) 
+      method2ccg (MethodHeader_MethodBody header body)
              = do ident <- getMethodName header
 	          edges <- java2ccg ident body
 	          return ((mkEdge parent ident)++edges)
@@ -73,7 +73,7 @@ java2ccg parent x
              = do ident  <- supplyName
 	          edges  <- java2ccg parent (init,expr,upd)
 		  edges' <- java2ccg ident stat
-		  return ((mkIterEdge parent ident)++edges++edges') 
+		  return ((mkIterEdge parent ident)++edges++edges')
       if2ccg1 (If expr stat_t)
              = do ident <- supplyName
 	          edges <- java2ccg parent expr
@@ -98,7 +98,7 @@ java2ccg parent x
 --- Helpers for generating new names -----------------------------------------
 
 supplyName :: MonadState Integer m => m String
-supplyName 
+supplyName
   = do i <- get
        put (i+1)
        return ("__"++(show i))
@@ -106,22 +106,22 @@ supplyName
 localNameSupply :: Monad m => Integer -> StateT Integer m a -> m a
 localNameSupply s
   = unlift (StateAlg s fst)
-	
+
 --- Extraction of identifiers from Java fragments ----------------------------
 
 -- Extract base identifier from full name
-		  
+
 name2str (Identifier_p idents) = last idents
 name2str (Class idents) = last idents
 
-    
+
 --- Helpers for dot generation -----------------------------------------------
 
 mkGraph n edges
   = "digraph "++n++" {\n"++edges++"}\n"
 
 mkNode n    = n++" [ shape=box ]\n"
-       
+
 mkEdge "" t = ""    -- This case takes care of root
 mkEdge s t  = s++" -> "++t++"\n"
 
@@ -131,15 +131,15 @@ mkCallEdge s t  = s++" -> "++t++" [ style=dashed ]\n"
 mkIterEdge "" t = ""    -- This case takes care of root
 mkIterEdge s t  = t++" [shape=circle,color=blue,label=\"\",size=.5]\n"++
                   s++" -> "++t++"\n"
-		  
+
 mkCondEdge ps "" t = ""    -- This case takes care of root
-mkCondEdge ps s t  
+mkCondEdge ps s t
   = t++" [shape=record,label="++label++",size=.125,color=brown]\n"++
     s++" -> "++t++"\n"
     where label  = "\"{ if |{ "++ports++" }}\""
           ports  = concat (sepWith " | " (map port ps))
-          port p = "<"++p++"> "++p 
+          port p = "<"++p++"> "++p
 
 ------------------------------------------------------------------------------
 
-  
+
