@@ -7,200 +7,201 @@ import Data.Data
 import Data.Typeable
 import Data.ATerm.Lib
 import Data.Generics.Strafunski.StrategyLib.Models.Deriving.TermRep
+import Prelude hiding (Left, Right)
  
-data Grammar = Sdf_aliases Aliases
-	     | Sdf_restrictions Restrictions
-	     | Sdf_sorts_ Symbols
-	     | Sdf_priorities Priorities
-	     | Sdf_imp_section ImpSection
-	     | Sdf_lexical_syntax Productions
-	     | Sdf_context_free_syntax Productions
-	     | Sdf_variables Productions
-	     | Sdf_lexical_variables Productions
-	     | Sdf_empty_grammar
-	     | Sdf_conc_grammars Grammar Grammar
-	     | Sdf_syntax Productions
-	     | Sdf_lexical_priorities Priorities
-	     | Sdf_context_free_priorities Priorities
-	     | Sdf_lexical_restrictions Restrictions
-	     | Sdf_context_free_restrictions Restrictions
+data Grammar = Aliases     Aliases
+	     | Restrictions     Restrictions
+	     | Sorts      Symbols
+	     | Priorities     Priorities
+	     | ImpSection      ImpSection
+	     | LexicalSyntax      Productions
+	     | ContextFreeSyntax       Productions
+	     | Variables     Productions
+	     | LexicalVariables      Productions
+	     | EmptyGrammar     
+	     | ConcGrammars      Grammar Grammar
+	     | Syntax     Productions
+	     | LexicalPriorities      Priorities
+	     | ContextFreePriorities       Priorities
+	     | LexicalRestrictions      Restrictions
+	     | ContextFreeRestrictions       Restrictions
       deriving ( Data, Typeable, Show )
  
-data Alias = Sdf_alias Symbol Symbol
+data Alias = Alias     Symbol Symbol
       deriving ( Data, Typeable, Show )
  
-data Aliases = Sdf_list [Alias]
+data Aliases = List     [Alias]
       deriving ( Data, Typeable, Show )
  
-data Lookahead = Sdf_char_class CharClass
-	       | Sdf_seq CharClass Lookaheads
+data Lookahead = CharClass      CharClass
+	       | Seq     CharClass Lookaheads
       deriving ( Data, Typeable, Show )
  
-data Lookaheads = Sdf_single Lookahead
-		| Sdf_alt Lookaheads Lookaheads
-		| Sdf_list1 [Lookahead]
+data Lookaheads = Single     Lookahead
+		| Alt     Lookaheads Lookaheads
+		| List1     [Lookahead]
       deriving ( Data, Typeable, Show )
  
-data Restriction = Sdf_follow Symbols Lookaheads
+data Restriction = Follow     Symbols Lookaheads
       deriving ( Data, Typeable, Show )
  
-data Restrictions = Sdf_list2 [Restriction]
+data Restrictions = List2     [Restriction]
       deriving ( Data, Typeable, Show )
  
-data Attribute = Sdf_reject
-	       | Sdf_prefer
-	       | Sdf_avoid
-	       | Sdf_cons1 ATerm'
-	       | Sdf_constructor
-	       | Sdf_memo
-	       | Sdf_traverse
-	       | Sdf_bracket
-	       | Sdf_atr Associativity
-	       | Sdf_id ModuleName
+data Attribute = Reject    
+	       | Prefer    
+	       | Avoid    
+	       | Cons1     ATerm'
+	       | Constructor    
+	       | Memo    
+	       | Traverse    
+	       | Bracket    
+	       | Atr     Associativity
+	       | Id     ModuleName
       deriving ( Data, Typeable, Show )
  
-data OptExp = Sdf_present IntCon
-	    | Sdf_absent
+data OptExp = Present     IntCon
+	    | Absent    
       deriving ( Data, Typeable, Show )
  
-data RealCon = Sdf_real_con IntCon NatCon OptExp
+data RealCon = RealCon      IntCon NatCon OptExp
       deriving ( Data, Typeable, Show )
  
-data AFun = Sdf_Literal Literal
+data AFun = Literal     Literal
       deriving ( Data, Typeable, Show )
  
-data ATerm' = Sdf_fun AFun
+data ATerm' = Fun     AFun
       deriving ( Data, Typeable, Show )
  
-data Symbol = Sdf_label Literal Symbol
-	    | Sdf_lit Literal
-	    | Sdf_sort Sort
-	    | Sdf_char_class1 CharClass
-	    | Sdf_empty1
-	    | Sdf_seq1 Symbol [Symbol]
-	    | Sdf_opt Symbol
-	    | Sdf_iter Symbol
-	    | Sdf_iter_star Symbol
-	    | Sdf_iter_sep Symbol Symbol
-	    | Sdf_iter_star_sep Symbol Symbol
-	    | Sdf_iter_n Symbol NatCon
-	    | Sdf_iter_sep_n Symbol Symbol NatCon
-	    | Sdf_set Symbol
-	    | Sdf_pair Symbol Symbol
-	    | Sdf_func Symbols Symbol
-	    | Sdf_alt1 Symbol Symbol
-	    | Sdf_perm Symbols
-	    | Sdf_cf Symbol
-	    | Sdf_lex Symbol
-	    | Sdf_varsym Symbol
-	    | Sdf_layout
-	    | Sdf_start
-	    | Sdf_file_start
+data Symbol = Label     Literal Symbol
+	    | Lit     Literal
+	    | Sort     Sort
+	    | CharClass1      CharClass
+	    | Empty1    
+	    | Seq1     Symbol [Symbol]
+	    | Opt     Symbol
+	    | Iter     Symbol
+	    | IterStar      Symbol
+	    | IterSep      Symbol Symbol
+	    | IterStarSep       Symbol Symbol
+	    | IterN      Symbol NatCon
+	    | IterSepN       Symbol Symbol NatCon
+	    | Set     Symbol
+	    | Pair     Symbol Symbol
+	    | Func     Symbols Symbol
+	    | Alt1     Symbol Symbol
+	    | Perm     Symbols
+	    | Cf     Symbol
+	    | Lex     Symbol
+	    | Varsym     Symbol
+	    | Layout    
+	    | Start    
+	    | FileStart     
       deriving ( Data, Typeable, Show )
  
-data Literal = Sdf_quoted QLiteral
-	     | Sdf_uqlit UQLiteral
+data Literal = Quoted     QLiteral
+	     | Uqlit     UQLiteral
       deriving ( Data, Typeable, Show )
  
-data Production = Sdf_prod_fun Literal [Symbol] Symbol Attributes
-		| Sdf_prod Symbols Symbol Attributes
+data Production = ProdFun      Literal [Symbol] Symbol Attributes
+		| Prod     Symbols Symbol Attributes
       deriving ( Data, Typeable, Show )
  
-data Character = Sdf_numeric NumChar
-	       | Sdf_short ShortChar
-	       | Sdf_top
-	       | Sdf_eof
-	       | Sdf_bot
-	       | Sdf_label_start
+data Character = Numeric     NumChar
+	       | Short     ShortChar
+	       | Top    
+	       | Eof    
+	       | Bot    
+	       | LabelStart     
       deriving ( Data, Typeable, Show )
  
-data CharRange = Sdf_Character Character
-	       | Sdf_range Character Character
+data CharRange = Character     Character
+	       | Range     Character Character
       deriving ( Data, Typeable, Show )
  
-data CharRanges = Sdf_CharRange CharRange
-		| Sdf_conc CharRanges CharRanges
+data CharRanges = CharRange     CharRange
+		| Conc     CharRanges CharRanges
       deriving ( Data, Typeable, Show )
  
-data OptCharRanges = Sdf_absent1
-		   | Sdf_present1 CharRanges
+data OptCharRanges = Absent1    
+		   | Present1     CharRanges
       deriving ( Data, Typeable, Show )
  
-data CharClass = Sdf_simple_charclass OptCharRanges
-	       | Sdf_comp CharClass
-	       | Sdf_diff CharClass CharClass
-	       | Sdf_isect CharClass CharClass
-	       | Sdf_union CharClass CharClass
+data CharClass = SimpleCharclass      OptCharRanges
+	       | Comp     CharClass
+	       | Diff     CharClass CharClass
+	       | Isect     CharClass CharClass
+	       | Union     CharClass CharClass
       deriving ( Data, Typeable, Show )
  
-data Associativity = Sdf_left
-		   | Sdf_right
-		   | Sdf_non_assoc
-		   | Sdf_assoc
+data Associativity = Left    
+		   | Right    
+		   | NonAssoc     
+		   | Assoc    
       deriving ( Data, Typeable, Show )
  
-data Group = Sdf_simple_group Production
-	   | Sdf_prods_group Productions
-	   | Sdf_assoc_group Associativity Productions
+data Group = SimpleGroup      Production
+	   | ProdsGroup      Productions
+	   | AssocGroup      Associativity Productions
       deriving ( Data, Typeable, Show )
  
-data Priority = Sdf_chain [Group]
-	      | Sdf_assoc1 Group Associativity Group
+data Priority = Chain     [Group]
+	      | Assoc1     Group Associativity Group
       deriving ( Data, Typeable, Show )
  
-data Priorities = Sdf_comma [Priority]
+data Priorities = Comma     [Priority]
       deriving ( Data, Typeable, Show )
  
-data IntCon = Sdf_natural NatCon
-	    | Sdf_positive NatCon
-	    | Sdf_negative NatCon
+data IntCon = Natural     NatCon
+	    | Positive     NatCon
+	    | Negative     NatCon
       deriving ( Data, Typeable, Show )
  
-data Renamings = Sdf_renamings [Renaming]
+data Renamings = Renamings     [Renaming]
       deriving ( Data, Typeable, Show )
  
-data Renaming = Sdf_symbol Symbol Symbol
-	      | Sdf_production Production Production
+data Renaming = Symbol     Symbol Symbol
+	      | Production     Production Production
       deriving ( Data, Typeable, Show )
  
-data Definition = Sdf_list4 [Module]
+data Definition = List4     [Module]
       deriving ( Data, Typeable, Show )
  
-data Module = Sdf_module_ ModuleName [ImpSection] Sections
+data Module = Module      ModuleName [ImpSection] Sections
       deriving ( Data, Typeable, Show )
  
-data Section = Sdf_exports_ Grammar
-	     | Sdf_hiddens Grammar
+data Section = Exports      Grammar
+	     | Hiddens     Grammar
       deriving ( Data, Typeable, Show )
  
-data Sections = Sdf_list5 [Section]
+data Sections = List5     [Section]
       deriving ( Data, Typeable, Show )
  
-data ModuleName = Sdf_unparameterized ModuleId
-		| Sdf_parameterized ModuleId Symbols
+data ModuleName = Unparameterized     ModuleId
+		| Parameterized     ModuleId Symbols
       deriving ( Data, Typeable, Show )
  
-data ImpSection = Sdf_imports_ Imports
+data ImpSection = Imports      Imports
       deriving ( Data, Typeable, Show )
  
-data Imports = Sdf_list6 [Import]
+data Imports = List6     [Import]
       deriving ( Data, Typeable, Show )
  
-data Import = Sdf_module1 ModuleName
-	    | Sdf_renamed_module ModuleName Renamings
+data Import = Module1     ModuleName
+	    | RenamedModule      ModuleName Renamings
       deriving ( Data, Typeable, Show )
  
-data Symbols = Sdf_list7 [Symbol]
+data Symbols = List7     [Symbol]
       deriving ( Data, Typeable, Show )
  
-data Attributes = Sdf_attrs [Attribute]
-		| Sdf_no_attrs
+data Attributes = Attrs     [Attribute]
+		| NoAttrs     
       deriving ( Data, Typeable, Show )
  
-data Productions = Sdf_list8 [Production]
+data Productions = List8     [Production]
       deriving ( Data, Typeable, Show )
  
-data SDF = Sdf_definition Definition
+data SDF = Definition     Definition
        deriving ( Data, Typeable, Show )
 
 type AlphaNumericalEscChar = String
@@ -229,390 +230,390 @@ type ModuleId = String
 
 {-* Generated by DrIFT : Look, but Don't Touch. *-}
 instance ATermConvertible Grammar where
-    toATerm (Sdf_aliases aa) = (AAppl "Sdf_aliases" [ toATerm aa ])
-    toATerm (Sdf_restrictions aa) = (AAppl "Sdf_restrictions" [ toATerm aa ])
-    toATerm (Sdf_sorts_ aa) = (AAppl "Sdf_sorts_" [ toATerm aa ])
-    toATerm (Sdf_priorities aa) = (AAppl "Sdf_priorities" [ toATerm aa ])
-    toATerm (Sdf_imp_section aa) = (AAppl "Sdf_imp_section" [ toATerm aa ])
-    toATerm (Sdf_lexical_syntax aa) = (AAppl "Sdf_lexical_syntax" [ toATerm aa ])
-    toATerm (Sdf_context_free_syntax aa) = (AAppl "Sdf_context_free_syntax" [ toATerm aa ])
-    toATerm (Sdf_variables aa) = (AAppl "Sdf_variables" [ toATerm aa ])
-    toATerm (Sdf_lexical_variables aa) = (AAppl "Sdf_lexical_variables" [ toATerm aa ])
-    toATerm Sdf_empty_grammar = (AAppl "Sdf_empty_grammar" [ ])
-    toATerm (Sdf_conc_grammars aa ab) = (AAppl "Sdf_conc_grammars" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_syntax aa) = (AAppl "Sdf_syntax" [ toATerm aa ])
-    toATerm (Sdf_lexical_priorities aa) = (AAppl "Sdf_lexical_priorities" [ toATerm aa ])
-    toATerm (Sdf_context_free_priorities aa) = (AAppl "Sdf_context_free_priorities" [ toATerm aa ])
-    toATerm (Sdf_lexical_restrictions aa) = (AAppl "Sdf_lexical_restrictions" [ toATerm aa ])
-    toATerm (Sdf_context_free_restrictions aa) = (AAppl "Sdf_context_free_restrictions" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_aliases" [ aa ]) = let aa' = fromATerm aa in (Sdf_aliases aa')
-    fromATerm (AAppl "Sdf_restrictions" [ aa ]) = let aa' = fromATerm aa in (Sdf_restrictions aa')
-    fromATerm (AAppl "Sdf_sorts_" [ aa ]) = let aa' = fromATerm aa in (Sdf_sorts_ aa')
-    fromATerm (AAppl "Sdf_priorities" [ aa ]) = let aa' = fromATerm aa in (Sdf_priorities aa')
-    fromATerm (AAppl "Sdf_imp_section" [ aa ]) = let aa' = fromATerm aa in (Sdf_imp_section aa')
-    fromATerm (AAppl "Sdf_lexical_syntax" [ aa ]) = let aa' = fromATerm aa in (Sdf_lexical_syntax aa')
-    fromATerm (AAppl "Sdf_context_free_syntax" [ aa ]) = let aa' = fromATerm aa in (Sdf_context_free_syntax aa')
-    fromATerm (AAppl "Sdf_variables" [ aa ]) = let aa' = fromATerm aa in (Sdf_variables aa')
-    fromATerm (AAppl "Sdf_lexical_variables" [ aa ]) = let aa' = fromATerm aa in (Sdf_lexical_variables aa')
-    fromATerm (AAppl "Sdf_empty_grammar" [ ]) = let in Sdf_empty_grammar
-    fromATerm (AAppl "Sdf_conc_grammars" [ aa,ab ]) = let aa' = fromATerm aa
-							  ab' = fromATerm ab in (Sdf_conc_grammars aa' ab')
-    fromATerm (AAppl "Sdf_syntax" [ aa ]) = let aa' = fromATerm aa in (Sdf_syntax aa')
-    fromATerm (AAppl "Sdf_lexical_priorities" [ aa ]) = let aa' = fromATerm aa in (Sdf_lexical_priorities aa')
-    fromATerm (AAppl "Sdf_context_free_priorities" [ aa ]) = let aa' = fromATerm aa in (Sdf_context_free_priorities aa')
-    fromATerm (AAppl "Sdf_lexical_restrictions" [ aa ]) = let aa' = fromATerm aa in (Sdf_lexical_restrictions aa')
-    fromATerm (AAppl "Sdf_context_free_restrictions" [ aa ]) = let aa' = fromATerm aa in (Sdf_context_free_restrictions aa')
+    toATerm (Aliases     aa) = (AAppl "Aliases"     [ toATerm aa ])
+    toATerm (Restrictions     aa) = (AAppl "Restrictions"     [ toATerm aa ])
+    toATerm (Sorts      aa) = (AAppl "Sorts"      [ toATerm aa ])
+    toATerm (Priorities     aa) = (AAppl "Priorities"     [ toATerm aa ])
+    toATerm (ImpSection      aa) = (AAppl "ImpSection"      [ toATerm aa ])
+    toATerm (LexicalSyntax      aa) = (AAppl "LexicalSyntax"      [ toATerm aa ])
+    toATerm (ContextFreeSyntax       aa) = (AAppl "ContextFreeSyntax"       [ toATerm aa ])
+    toATerm (Variables     aa) = (AAppl "Variables"     [ toATerm aa ])
+    toATerm (LexicalVariables      aa) = (AAppl "LexicalVariables"      [ toATerm aa ])
+    toATerm EmptyGrammar      = (AAppl "EmptyGrammar"      [ ])
+    toATerm (ConcGrammars      aa ab) = (AAppl "ConcGrammars"      [ toATerm aa,toATerm ab ])
+    toATerm (Syntax     aa) = (AAppl "Syntax"     [ toATerm aa ])
+    toATerm (LexicalPriorities      aa) = (AAppl "LexicalPriorities"      [ toATerm aa ])
+    toATerm (ContextFreePriorities       aa) = (AAppl "ContextFreePriorities"       [ toATerm aa ])
+    toATerm (LexicalRestrictions      aa) = (AAppl "LexicalRestrictions"      [ toATerm aa ])
+    toATerm (ContextFreeRestrictions       aa) = (AAppl "ContextFreeRestrictions"       [ toATerm aa ])
+    fromATerm (AAppl "Aliases"     [ aa ]) = let aa' = fromATerm aa in (Aliases     aa')
+    fromATerm (AAppl "Restrictions"     [ aa ]) = let aa' = fromATerm aa in (Restrictions     aa')
+    fromATerm (AAppl "Sorts"      [ aa ]) = let aa' = fromATerm aa in (Sorts      aa')
+    fromATerm (AAppl "Priorities"     [ aa ]) = let aa' = fromATerm aa in (Priorities     aa')
+    fromATerm (AAppl "ImpSection"      [ aa ]) = let aa' = fromATerm aa in (ImpSection      aa')
+    fromATerm (AAppl "LexicalSyntax"      [ aa ]) = let aa' = fromATerm aa in (LexicalSyntax      aa')
+    fromATerm (AAppl "ContextFreeSyntax"       [ aa ]) = let aa' = fromATerm aa in (ContextFreeSyntax       aa')
+    fromATerm (AAppl "Variables"     [ aa ]) = let aa' = fromATerm aa in (Variables     aa')
+    fromATerm (AAppl "LexicalVariables"      [ aa ]) = let aa' = fromATerm aa in (LexicalVariables      aa')
+    fromATerm (AAppl "EmptyGrammar"      [ ]) = let in EmptyGrammar     
+    fromATerm (AAppl "ConcGrammars"      [ aa,ab ]) = let aa' = fromATerm aa
+							  ab' = fromATerm ab in (ConcGrammars      aa' ab')
+    fromATerm (AAppl "Syntax"     [ aa ]) = let aa' = fromATerm aa in (Syntax     aa')
+    fromATerm (AAppl "LexicalPriorities"      [ aa ]) = let aa' = fromATerm aa in (LexicalPriorities      aa')
+    fromATerm (AAppl "ContextFreePriorities"       [ aa ]) = let aa' = fromATerm aa in (ContextFreePriorities       aa')
+    fromATerm (AAppl "LexicalRestrictions"      [ aa ]) = let aa' = fromATerm aa in (LexicalRestrictions      aa')
+    fromATerm (AAppl "ContextFreeRestrictions"       [ aa ]) = let aa' = fromATerm aa in (ContextFreeRestrictions       aa')
     fromATerm u = fromATermError "Grammar" u
 
 instance ATermConvertible Alias where
-    toATerm (Sdf_alias aa ab) = (AAppl "Sdf_alias" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_alias" [ aa,ab ]) = let aa' = fromATerm aa
-						  ab' = fromATerm ab in (Sdf_alias aa' ab')
+    toATerm (Alias     aa ab) = (AAppl "Alias"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "Alias"     [ aa,ab ]) = let aa' = fromATerm aa
+						  ab' = fromATerm ab in (Alias     aa' ab')
     fromATerm u = fromATermError "Alias" u
 
 instance ATermConvertible Aliases where
-    toATerm (Sdf_list aa) = (AAppl "Sdf_list" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list" [ aa ]) = let aa' = fromATerm aa in (Sdf_list aa')
+    toATerm (List     aa) = (AAppl "List"     [ toATerm aa ])
+    fromATerm (AAppl "List"     [ aa ]) = let aa' = fromATerm aa in (List     aa')
     fromATerm u = fromATermError "Aliases" u
 
 instance ATermConvertible Lookahead where
-    toATerm (Sdf_char_class aa) = (AAppl "Sdf_char_class" [ toATerm aa ])
-    toATerm (Sdf_seq aa ab) = (AAppl "Sdf_seq" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_char_class" [ aa ]) = let aa' = fromATerm aa in (Sdf_char_class aa')
-    fromATerm (AAppl "Sdf_seq" [ aa,ab ]) = let aa' = fromATerm aa
-						ab' = fromATerm ab in (Sdf_seq aa' ab')
+    toATerm (CharClass      aa) = (AAppl "CharClass"      [ toATerm aa ])
+    toATerm (Seq     aa ab) = (AAppl "Seq"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "CharClass"      [ aa ]) = let aa' = fromATerm aa in (CharClass      aa')
+    fromATerm (AAppl "Seq"     [ aa,ab ]) = let aa' = fromATerm aa
+						ab' = fromATerm ab in (Seq     aa' ab')
     fromATerm u = fromATermError "Lookahead" u
 
 instance ATermConvertible Lookaheads where
-    toATerm (Sdf_single aa) = (AAppl "Sdf_single" [ toATerm aa ])
-    toATerm (Sdf_alt aa ab) = (AAppl "Sdf_alt" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_list1 aa) = (AAppl "Sdf_list1" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_single" [ aa ]) = let aa' = fromATerm aa in (Sdf_single aa')
-    fromATerm (AAppl "Sdf_alt" [ aa,ab ]) = let aa' = fromATerm aa
-						ab' = fromATerm ab in (Sdf_alt aa' ab')
-    fromATerm (AAppl "Sdf_list1" [ aa ]) = let aa' = fromATerm aa in (Sdf_list1 aa')
+    toATerm (Single     aa) = (AAppl "Single"     [ toATerm aa ])
+    toATerm (Alt     aa ab) = (AAppl "Alt"     [ toATerm aa,toATerm ab ])
+    toATerm (List1     aa) = (AAppl "List1"     [ toATerm aa ])
+    fromATerm (AAppl "Single"     [ aa ]) = let aa' = fromATerm aa in (Single     aa')
+    fromATerm (AAppl "Alt"     [ aa,ab ]) = let aa' = fromATerm aa
+						ab' = fromATerm ab in (Alt     aa' ab')
+    fromATerm (AAppl "List1"     [ aa ]) = let aa' = fromATerm aa in (List1     aa')
     fromATerm u = fromATermError "Lookaheads" u
 
 instance ATermConvertible Restriction where
-    toATerm (Sdf_follow aa ab) = (AAppl "Sdf_follow" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_follow" [ aa,ab ]) = let aa' = fromATerm aa
-						   ab' = fromATerm ab in (Sdf_follow aa' ab')
+    toATerm (Follow     aa ab) = (AAppl "Follow"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "Follow"     [ aa,ab ]) = let aa' = fromATerm aa
+						   ab' = fromATerm ab in (Follow     aa' ab')
     fromATerm u = fromATermError "Restriction" u
 
 instance ATermConvertible Restrictions where
-    toATerm (Sdf_list2 aa) = (AAppl "Sdf_list2" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list2" [ aa ]) = let aa' = fromATerm aa in (Sdf_list2 aa')
+    toATerm (List2     aa) = (AAppl "List2"     [ toATerm aa ])
+    fromATerm (AAppl "List2"     [ aa ]) = let aa' = fromATerm aa in (List2     aa')
     fromATerm u = fromATermError "Restrictions" u
 
 instance ATermConvertible Attribute where
-    toATerm Sdf_reject = (AAppl "Sdf_reject" [ ])
-    toATerm Sdf_prefer = (AAppl "Sdf_prefer" [ ])
-    toATerm Sdf_avoid = (AAppl "Sdf_avoid" [ ])
-    toATerm (Sdf_cons1 aa) = (AAppl "Sdf_cons1" [ toATerm aa ])
-    toATerm Sdf_constructor = (AAppl "Sdf_constructor" [ ])
-    toATerm Sdf_memo = (AAppl "Sdf_memo" [ ])
-    toATerm Sdf_traverse = (AAppl "Sdf_traverse" [ ])
-    toATerm Sdf_bracket = (AAppl "Sdf_bracket" [ ])
-    toATerm (Sdf_atr aa) = (AAppl "Sdf_atr" [ toATerm aa ])
-    toATerm (Sdf_id aa) = (AAppl "Sdf_id" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_reject" [ ]) = let in Sdf_reject
-    fromATerm (AAppl "Sdf_prefer" [ ]) = let in Sdf_prefer
-    fromATerm (AAppl "Sdf_avoid" [ ]) = let in Sdf_avoid
-    fromATerm (AAppl "Sdf_cons1" [ aa ]) = let aa' = fromATerm aa in (Sdf_cons1 aa')
-    fromATerm (AAppl "Sdf_constructor" [ ]) = let in Sdf_constructor
-    fromATerm (AAppl "Sdf_memo" [ ]) = let in Sdf_memo
-    fromATerm (AAppl "Sdf_traverse" [ ]) = let in Sdf_traverse
-    fromATerm (AAppl "Sdf_bracket" [ ]) = let in Sdf_bracket
-    fromATerm (AAppl "Sdf_atr" [ aa ]) = let aa' = fromATerm aa in (Sdf_atr aa')
-    fromATerm (AAppl "Sdf_id" [ aa ]) = let aa' = fromATerm aa in (Sdf_id aa')
+    toATerm Reject     = (AAppl "Reject"     [ ])
+    toATerm Prefer     = (AAppl "Prefer"     [ ])
+    toATerm Avoid     = (AAppl "Avoid"     [ ])
+    toATerm (Cons1     aa) = (AAppl "Cons1"     [ toATerm aa ])
+    toATerm Constructor     = (AAppl "Constructor"     [ ])
+    toATerm Memo     = (AAppl "Memo"     [ ])
+    toATerm Traverse     = (AAppl "Traverse"     [ ])
+    toATerm Bracket     = (AAppl "Bracket"     [ ])
+    toATerm (Atr     aa) = (AAppl "Atr"     [ toATerm aa ])
+    toATerm (Id     aa) = (AAppl "Id"     [ toATerm aa ])
+    fromATerm (AAppl "Reject"     [ ]) = let in Reject    
+    fromATerm (AAppl "Prefer"     [ ]) = let in Prefer    
+    fromATerm (AAppl "Avoid"     [ ]) = let in Avoid    
+    fromATerm (AAppl "Cons1"     [ aa ]) = let aa' = fromATerm aa in (Cons1     aa')
+    fromATerm (AAppl "Constructor"     [ ]) = let in Constructor    
+    fromATerm (AAppl "Memo"     [ ]) = let in Memo    
+    fromATerm (AAppl "Traverse"     [ ]) = let in Traverse    
+    fromATerm (AAppl "Bracket"     [ ]) = let in Bracket    
+    fromATerm (AAppl "Atr"     [ aa ]) = let aa' = fromATerm aa in (Atr     aa')
+    fromATerm (AAppl "Id"     [ aa ]) = let aa' = fromATerm aa in (Id     aa')
     fromATerm u = fromATermError "Attribute" u
 
 instance ATermConvertible OptExp where
-    toATerm (Sdf_present aa) = (AAppl "Sdf_present" [ toATerm aa ])
-    toATerm Sdf_absent = (AAppl "Sdf_absent" [ ])
-    fromATerm (AAppl "Sdf_present" [ aa ]) = let aa' = fromATerm aa in (Sdf_present aa')
-    fromATerm (AAppl "Sdf_absent" [ ]) = let in Sdf_absent
+    toATerm (Present     aa) = (AAppl "Present"     [ toATerm aa ])
+    toATerm Absent     = (AAppl "Absent"     [ ])
+    fromATerm (AAppl "Present"     [ aa ]) = let aa' = fromATerm aa in (Present     aa')
+    fromATerm (AAppl "Absent"     [ ]) = let in Absent    
     fromATerm u = fromATermError "OptExp" u
 
 instance ATermConvertible RealCon where
-    toATerm (Sdf_real_con aa ab ac) = (AAppl "Sdf_real_con" [ toATerm aa,toATerm ab,toATerm ac ])
-    fromATerm (AAppl "Sdf_real_con" [ aa,ab,ac ]) = let aa' = fromATerm aa
+    toATerm (RealCon      aa ab ac) = (AAppl "RealCon"      [ toATerm aa,toATerm ab,toATerm ac ])
+    fromATerm (AAppl "RealCon"      [ aa,ab,ac ]) = let aa' = fromATerm aa
 							ab' = fromATerm ab
-							ac' = fromATerm ac in (Sdf_real_con aa' ab' ac')
+							ac' = fromATerm ac in (RealCon      aa' ab' ac')
     fromATerm u = fromATermError "RealCon" u
 
 instance ATermConvertible AFun where
-    toATerm (Sdf_Literal aa) = (AAppl "Sdf_Literal" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_Literal" [ aa ]) = let aa' = fromATerm aa in (Sdf_Literal aa')
+    toATerm (Literal     aa) = (AAppl "Literal"     [ toATerm aa ])
+    fromATerm (AAppl "Literal"     [ aa ]) = let aa' = fromATerm aa in (Literal     aa')
     fromATerm u = fromATermError "AFun" u
 
 instance ATermConvertible ATerm' where
-    toATerm (Sdf_fun aa) = (AAppl "Sdf_fun" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_fun" [ aa ]) = let aa' = fromATerm aa in (Sdf_fun aa')
+    toATerm (Fun     aa) = (AAppl "Fun"     [ toATerm aa ])
+    fromATerm (AAppl "Fun"     [ aa ]) = let aa' = fromATerm aa in (Fun     aa')
     fromATerm u = fromATermError "ATerm'" u
 
 instance ATermConvertible Symbol where
-    toATerm (Sdf_label aa ab) = (AAppl "Sdf_label" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_lit aa) = (AAppl "Sdf_lit" [ toATerm aa ])
-    toATerm (Sdf_sort aa) = (AAppl "Sdf_sort" [ toATerm aa ])
-    toATerm (Sdf_char_class1 aa) = (AAppl "Sdf_char_class1" [ toATerm aa ])
-    toATerm Sdf_empty1 = (AAppl "Sdf_empty1" [ ])
-    toATerm (Sdf_seq1 aa ab) = (AAppl "Sdf_seq1" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_opt aa) = (AAppl "Sdf_opt" [ toATerm aa ])
-    toATerm (Sdf_iter aa) = (AAppl "Sdf_iter" [ toATerm aa ])
-    toATerm (Sdf_iter_star aa) = (AAppl "Sdf_iter_star" [ toATerm aa ])
-    toATerm (Sdf_iter_sep aa ab) = (AAppl "Sdf_iter_sep" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_iter_star_sep aa ab) = (AAppl "Sdf_iter_star_sep" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_iter_n aa ab) = (AAppl "Sdf_iter_n" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_iter_sep_n aa ab ac) = (AAppl "Sdf_iter_sep_n" [ toATerm aa,toATerm ab,toATerm ac ])
-    toATerm (Sdf_set aa) = (AAppl "Sdf_set" [ toATerm aa ])
-    toATerm (Sdf_pair aa ab) = (AAppl "Sdf_pair" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_func aa ab) = (AAppl "Sdf_func" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_alt1 aa ab) = (AAppl "Sdf_alt1" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_perm aa) = (AAppl "Sdf_perm" [ toATerm aa ])
-    toATerm (Sdf_cf aa) = (AAppl "Sdf_cf" [ toATerm aa ])
-    toATerm (Sdf_lex aa) = (AAppl "Sdf_lex" [ toATerm aa ])
-    toATerm (Sdf_varsym aa) = (AAppl "Sdf_varsym" [ toATerm aa ])
-    toATerm Sdf_layout = (AAppl "Sdf_layout" [ ])
-    toATerm Sdf_start = (AAppl "Sdf_start" [ ])
-    toATerm Sdf_file_start = (AAppl "Sdf_file_start" [ ])
-    fromATerm (AAppl "Sdf_label" [ aa,ab ]) = let aa' = fromATerm aa
-						  ab' = fromATerm ab in (Sdf_label aa' ab')
-    fromATerm (AAppl "Sdf_lit" [ aa ]) = let aa' = fromATerm aa in (Sdf_lit aa')
-    fromATerm (AAppl "Sdf_sort" [ aa ]) = let aa' = fromATerm aa in (Sdf_sort aa')
-    fromATerm (AAppl "Sdf_char_class1" [ aa ]) = let aa' = fromATerm aa in (Sdf_char_class1 aa')
-    fromATerm (AAppl "Sdf_empty1" [ ]) = let in Sdf_empty1
-    fromATerm (AAppl "Sdf_seq1" [ aa,ab ]) = let aa' = fromATerm aa
-						 ab' = fromATerm ab in (Sdf_seq1 aa' ab')
-    fromATerm (AAppl "Sdf_opt" [ aa ]) = let aa' = fromATerm aa in (Sdf_opt aa')
-    fromATerm (AAppl "Sdf_iter" [ aa ]) = let aa' = fromATerm aa in (Sdf_iter aa')
-    fromATerm (AAppl "Sdf_iter_star" [ aa ]) = let aa' = fromATerm aa in (Sdf_iter_star aa')
-    fromATerm (AAppl "Sdf_iter_sep" [ aa,ab ]) = let aa' = fromATerm aa
-						     ab' = fromATerm ab in (Sdf_iter_sep aa' ab')
-    fromATerm (AAppl "Sdf_iter_star_sep" [ aa,ab ]) = let aa' = fromATerm aa
-							  ab' = fromATerm ab in (Sdf_iter_star_sep aa' ab')
-    fromATerm (AAppl "Sdf_iter_n" [ aa,ab ]) = let aa' = fromATerm aa
-						   ab' = fromATerm ab in (Sdf_iter_n aa' ab')
-    fromATerm (AAppl "Sdf_iter_sep_n" [ aa,ab,ac ]) = let aa' = fromATerm aa
+    toATerm (Label     aa ab) = (AAppl "Label"     [ toATerm aa,toATerm ab ])
+    toATerm (Lit     aa) = (AAppl "Lit"     [ toATerm aa ])
+    toATerm (Sort     aa) = (AAppl "Sort"     [ toATerm aa ])
+    toATerm (CharClass1      aa) = (AAppl "CharClass1"      [ toATerm aa ])
+    toATerm Empty1     = (AAppl "Empty1"     [ ])
+    toATerm (Seq1     aa ab) = (AAppl "Seq1"     [ toATerm aa,toATerm ab ])
+    toATerm (Opt     aa) = (AAppl "Opt"     [ toATerm aa ])
+    toATerm (Iter     aa) = (AAppl "Iter"     [ toATerm aa ])
+    toATerm (IterStar      aa) = (AAppl "IterStar"      [ toATerm aa ])
+    toATerm (IterSep      aa ab) = (AAppl "IterSep"      [ toATerm aa,toATerm ab ])
+    toATerm (IterStarSep       aa ab) = (AAppl "IterStarSep"       [ toATerm aa,toATerm ab ])
+    toATerm (IterN      aa ab) = (AAppl "IterN"      [ toATerm aa,toATerm ab ])
+    toATerm (IterSepN       aa ab ac) = (AAppl "IterSepN"       [ toATerm aa,toATerm ab,toATerm ac ])
+    toATerm (Set     aa) = (AAppl "Set"     [ toATerm aa ])
+    toATerm (Pair     aa ab) = (AAppl "Pair"     [ toATerm aa,toATerm ab ])
+    toATerm (Func     aa ab) = (AAppl "Func"     [ toATerm aa,toATerm ab ])
+    toATerm (Alt1     aa ab) = (AAppl "Alt1"     [ toATerm aa,toATerm ab ])
+    toATerm (Perm     aa) = (AAppl "Perm"     [ toATerm aa ])
+    toATerm (Cf     aa) = (AAppl "Cf"     [ toATerm aa ])
+    toATerm (Lex     aa) = (AAppl "Lex"     [ toATerm aa ])
+    toATerm (Varsym     aa) = (AAppl "Varsym"     [ toATerm aa ])
+    toATerm Layout     = (AAppl "Layout"     [ ])
+    toATerm Start     = (AAppl "Start"     [ ])
+    toATerm FileStart      = (AAppl "FileStart"      [ ])
+    fromATerm (AAppl "Label"     [ aa,ab ]) = let aa' = fromATerm aa
+						  ab' = fromATerm ab in (Label     aa' ab')
+    fromATerm (AAppl "Lit"     [ aa ]) = let aa' = fromATerm aa in (Lit     aa')
+    fromATerm (AAppl "Sort"     [ aa ]) = let aa' = fromATerm aa in (Sort     aa')
+    fromATerm (AAppl "CharClass1"      [ aa ]) = let aa' = fromATerm aa in (CharClass1      aa')
+    fromATerm (AAppl "Empty1"     [ ]) = let in Empty1    
+    fromATerm (AAppl "Seq1"     [ aa,ab ]) = let aa' = fromATerm aa
+						 ab' = fromATerm ab in (Seq1     aa' ab')
+    fromATerm (AAppl "Opt"     [ aa ]) = let aa' = fromATerm aa in (Opt     aa')
+    fromATerm (AAppl "Iter"     [ aa ]) = let aa' = fromATerm aa in (Iter     aa')
+    fromATerm (AAppl "IterStar"      [ aa ]) = let aa' = fromATerm aa in (IterStar      aa')
+    fromATerm (AAppl "IterSep"      [ aa,ab ]) = let aa' = fromATerm aa
+						     ab' = fromATerm ab in (IterSep      aa' ab')
+    fromATerm (AAppl "IterStarSep"       [ aa,ab ]) = let aa' = fromATerm aa
+							  ab' = fromATerm ab in (IterStarSep       aa' ab')
+    fromATerm (AAppl "IterN"      [ aa,ab ]) = let aa' = fromATerm aa
+						   ab' = fromATerm ab in (IterN      aa' ab')
+    fromATerm (AAppl "IterSepN"       [ aa,ab,ac ]) = let aa' = fromATerm aa
 							  ab' = fromATerm ab
-							  ac' = fromATerm ac in (Sdf_iter_sep_n aa' ab' ac')
-    fromATerm (AAppl "Sdf_set" [ aa ]) = let aa' = fromATerm aa in (Sdf_set aa')
-    fromATerm (AAppl "Sdf_pair" [ aa,ab ]) = let aa' = fromATerm aa
-						 ab' = fromATerm ab in (Sdf_pair aa' ab')
-    fromATerm (AAppl "Sdf_func" [ aa,ab ]) = let aa' = fromATerm aa
-						 ab' = fromATerm ab in (Sdf_func aa' ab')
-    fromATerm (AAppl "Sdf_alt1" [ aa,ab ]) = let aa' = fromATerm aa
-						 ab' = fromATerm ab in (Sdf_alt1 aa' ab')
-    fromATerm (AAppl "Sdf_perm" [ aa ]) = let aa' = fromATerm aa in (Sdf_perm aa')
-    fromATerm (AAppl "Sdf_cf" [ aa ]) = let aa' = fromATerm aa in (Sdf_cf aa')
-    fromATerm (AAppl "Sdf_lex" [ aa ]) = let aa' = fromATerm aa in (Sdf_lex aa')
-    fromATerm (AAppl "Sdf_varsym" [ aa ]) = let aa' = fromATerm aa in (Sdf_varsym aa')
-    fromATerm (AAppl "Sdf_layout" [ ]) = let in Sdf_layout
-    fromATerm (AAppl "Sdf_start" [ ]) = let in Sdf_start
-    fromATerm (AAppl "Sdf_file_start" [ ]) = let in Sdf_file_start
+							  ac' = fromATerm ac in (IterSepN       aa' ab' ac')
+    fromATerm (AAppl "Set"     [ aa ]) = let aa' = fromATerm aa in (Set     aa')
+    fromATerm (AAppl "Pair"     [ aa,ab ]) = let aa' = fromATerm aa
+						 ab' = fromATerm ab in (Pair     aa' ab')
+    fromATerm (AAppl "Func"     [ aa,ab ]) = let aa' = fromATerm aa
+						 ab' = fromATerm ab in (Func     aa' ab')
+    fromATerm (AAppl "Alt1"     [ aa,ab ]) = let aa' = fromATerm aa
+						 ab' = fromATerm ab in (Alt1     aa' ab')
+    fromATerm (AAppl "Perm"     [ aa ]) = let aa' = fromATerm aa in (Perm     aa')
+    fromATerm (AAppl "Cf"     [ aa ]) = let aa' = fromATerm aa in (Cf     aa')
+    fromATerm (AAppl "Lex"     [ aa ]) = let aa' = fromATerm aa in (Lex     aa')
+    fromATerm (AAppl "Varsym"     [ aa ]) = let aa' = fromATerm aa in (Varsym     aa')
+    fromATerm (AAppl "Layout"     [ ]) = let in Layout    
+    fromATerm (AAppl "Start"     [ ]) = let in Start    
+    fromATerm (AAppl "FileStart"      [ ]) = let in FileStart     
     fromATerm u = fromATermError "Symbol" u
 
 instance ATermConvertible Literal where
-    toATerm (Sdf_quoted aa) = (AAppl "Sdf_quoted" [ toATerm aa ])
-    toATerm (Sdf_uqlit aa) = (AAppl "Sdf_uqlit" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_quoted" [ aa ]) = let aa' = fromATerm aa in (Sdf_quoted aa')
-    fromATerm (AAppl "Sdf_uqlit" [ aa ]) = let aa' = fromATerm aa in (Sdf_uqlit aa')
+    toATerm (Quoted     aa) = (AAppl "Quoted"     [ toATerm aa ])
+    toATerm (Uqlit     aa) = (AAppl "Uqlit"     [ toATerm aa ])
+    fromATerm (AAppl "Quoted"     [ aa ]) = let aa' = fromATerm aa in (Quoted     aa')
+    fromATerm (AAppl "Uqlit"     [ aa ]) = let aa' = fromATerm aa in (Uqlit     aa')
     fromATerm u = fromATermError "Literal" u
 
 instance ATermConvertible Production where
-    toATerm (Sdf_prod_fun aa ab ac ad) = (AAppl "Sdf_prod_fun" [ toATerm aa,toATerm ab,toATerm ac,toATerm ad ])
-    toATerm (Sdf_prod aa ab ac) = (AAppl "Sdf_prod" [ toATerm aa,toATerm ab,toATerm ac ])
-    fromATerm (AAppl "Sdf_prod_fun" [ aa,ab,ac,ad ]) = let aa' = fromATerm aa
+    toATerm (ProdFun      aa ab ac ad) = (AAppl "ProdFun"      [ toATerm aa,toATerm ab,toATerm ac,toATerm ad ])
+    toATerm (Prod     aa ab ac) = (AAppl "Prod"     [ toATerm aa,toATerm ab,toATerm ac ])
+    fromATerm (AAppl "ProdFun"      [ aa,ab,ac,ad ]) = let aa' = fromATerm aa
 							   ab' = fromATerm ab
 							   ac' = fromATerm ac
-							   ad' = fromATerm ad in (Sdf_prod_fun aa' ab' ac' ad')
-    fromATerm (AAppl "Sdf_prod" [ aa,ab,ac ]) = let aa' = fromATerm aa
+							   ad' = fromATerm ad in (ProdFun      aa' ab' ac' ad')
+    fromATerm (AAppl "Prod"     [ aa,ab,ac ]) = let aa' = fromATerm aa
 						    ab' = fromATerm ab
-						    ac' = fromATerm ac in (Sdf_prod aa' ab' ac')
+						    ac' = fromATerm ac in (Prod     aa' ab' ac')
     fromATerm u = fromATermError "Production" u
 
 instance ATermConvertible Character where
-    toATerm (Sdf_numeric aa) = (AAppl "Sdf_numeric" [ toATerm aa ])
-    toATerm (Sdf_short aa) = (AAppl "Sdf_short" [ toATerm aa ])
-    toATerm Sdf_top = (AAppl "Sdf_top" [ ])
-    toATerm Sdf_eof = (AAppl "Sdf_eof" [ ])
-    toATerm Sdf_bot = (AAppl "Sdf_bot" [ ])
-    toATerm Sdf_label_start = (AAppl "Sdf_label_start" [ ])
-    fromATerm (AAppl "Sdf_numeric" [ aa ]) = let aa' = fromATerm aa in (Sdf_numeric aa')
-    fromATerm (AAppl "Sdf_short" [ aa ]) = let aa' = fromATerm aa in (Sdf_short aa')
-    fromATerm (AAppl "Sdf_top" [ ]) = let in Sdf_top
-    fromATerm (AAppl "Sdf_eof" [ ]) = let in Sdf_eof
-    fromATerm (AAppl "Sdf_bot" [ ]) = let in Sdf_bot
-    fromATerm (AAppl "Sdf_label_start" [ ]) = let in Sdf_label_start
+    toATerm (Numeric     aa) = (AAppl "Numeric"     [ toATerm aa ])
+    toATerm (Short     aa) = (AAppl "Short"     [ toATerm aa ])
+    toATerm Top     = (AAppl "Top"     [ ])
+    toATerm Eof     = (AAppl "Eof"     [ ])
+    toATerm Bot     = (AAppl "Bot"     [ ])
+    toATerm LabelStart      = (AAppl "LabelStart"      [ ])
+    fromATerm (AAppl "Numeric"     [ aa ]) = let aa' = fromATerm aa in (Numeric     aa')
+    fromATerm (AAppl "Short"     [ aa ]) = let aa' = fromATerm aa in (Short     aa')
+    fromATerm (AAppl "Top"     [ ]) = let in Top    
+    fromATerm (AAppl "Eof"     [ ]) = let in Eof    
+    fromATerm (AAppl "Bot"     [ ]) = let in Bot    
+    fromATerm (AAppl "LabelStart"      [ ]) = let in LabelStart     
     fromATerm u = fromATermError "Character" u
 
 instance ATermConvertible CharRange where
-    toATerm (Sdf_Character aa) = (AAppl "Sdf_Character" [ toATerm aa ])
-    toATerm (Sdf_range aa ab) = (AAppl "Sdf_range" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_Character" [ aa ]) = let aa' = fromATerm aa in (Sdf_Character aa')
-    fromATerm (AAppl "Sdf_range" [ aa,ab ]) = let aa' = fromATerm aa
-						  ab' = fromATerm ab in (Sdf_range aa' ab')
+    toATerm (Character     aa) = (AAppl "Character"     [ toATerm aa ])
+    toATerm (Range     aa ab) = (AAppl "Range"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "Character"     [ aa ]) = let aa' = fromATerm aa in (Character     aa')
+    fromATerm (AAppl "Range"     [ aa,ab ]) = let aa' = fromATerm aa
+						  ab' = fromATerm ab in (Range     aa' ab')
     fromATerm u = fromATermError "CharRange" u
 
 instance ATermConvertible CharRanges where
-    toATerm (Sdf_CharRange aa) = (AAppl "Sdf_CharRange" [ toATerm aa ])
-    toATerm (Sdf_conc aa ab) = (AAppl "Sdf_conc" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_CharRange" [ aa ]) = let aa' = fromATerm aa in (Sdf_CharRange aa')
-    fromATerm (AAppl "Sdf_conc" [ aa,ab ]) = let aa' = fromATerm aa
-						 ab' = fromATerm ab in (Sdf_conc aa' ab')
+    toATerm (CharRange     aa) = (AAppl "CharRange"     [ toATerm aa ])
+    toATerm (Conc     aa ab) = (AAppl "Conc"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "CharRange"     [ aa ]) = let aa' = fromATerm aa in (CharRange     aa')
+    fromATerm (AAppl "Conc"     [ aa,ab ]) = let aa' = fromATerm aa
+						 ab' = fromATerm ab in (Conc     aa' ab')
     fromATerm u = fromATermError "CharRanges" u
 
 instance ATermConvertible OptCharRanges where
-    toATerm Sdf_absent1 = (AAppl "Sdf_absent1" [ ])
-    toATerm (Sdf_present1 aa) = (AAppl "Sdf_present1" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_absent1" [ ]) = let in Sdf_absent1
-    fromATerm (AAppl "Sdf_present1" [ aa ]) = let aa' = fromATerm aa in (Sdf_present1 aa')
+    toATerm Absent1     = (AAppl "Absent1"     [ ])
+    toATerm (Present1     aa) = (AAppl "Present1"     [ toATerm aa ])
+    fromATerm (AAppl "Absent1"     [ ]) = let in Absent1    
+    fromATerm (AAppl "Present1"     [ aa ]) = let aa' = fromATerm aa in (Present1     aa')
     fromATerm u = fromATermError "OptCharRanges" u
 
 instance ATermConvertible CharClass where
-    toATerm (Sdf_simple_charclass aa) = (AAppl "Sdf_simple_charclass" [ toATerm aa ])
-    toATerm (Sdf_comp aa) = (AAppl "Sdf_comp" [ toATerm aa ])
-    toATerm (Sdf_diff aa ab) = (AAppl "Sdf_diff" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_isect aa ab) = (AAppl "Sdf_isect" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_union aa ab) = (AAppl "Sdf_union" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_simple_charclass" [ aa ]) = let aa' = fromATerm aa in (Sdf_simple_charclass aa')
-    fromATerm (AAppl "Sdf_comp" [ aa ]) = let aa' = fromATerm aa in (Sdf_comp aa')
-    fromATerm (AAppl "Sdf_diff" [ aa,ab ]) = let aa' = fromATerm aa
-						 ab' = fromATerm ab in (Sdf_diff aa' ab')
-    fromATerm (AAppl "Sdf_isect" [ aa,ab ]) = let aa' = fromATerm aa
-						  ab' = fromATerm ab in (Sdf_isect aa' ab')
-    fromATerm (AAppl "Sdf_union" [ aa,ab ]) = let aa' = fromATerm aa
-						  ab' = fromATerm ab in (Sdf_union aa' ab')
+    toATerm (SimpleCharclass      aa) = (AAppl "SimpleCharclass"      [ toATerm aa ])
+    toATerm (Comp     aa) = (AAppl "Comp"     [ toATerm aa ])
+    toATerm (Diff     aa ab) = (AAppl "Diff"     [ toATerm aa,toATerm ab ])
+    toATerm (Isect     aa ab) = (AAppl "Isect"     [ toATerm aa,toATerm ab ])
+    toATerm (Union     aa ab) = (AAppl "Union"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "SimpleCharclass"      [ aa ]) = let aa' = fromATerm aa in (SimpleCharclass      aa')
+    fromATerm (AAppl "Comp"     [ aa ]) = let aa' = fromATerm aa in (Comp     aa')
+    fromATerm (AAppl "Diff"     [ aa,ab ]) = let aa' = fromATerm aa
+						 ab' = fromATerm ab in (Diff     aa' ab')
+    fromATerm (AAppl "Isect"     [ aa,ab ]) = let aa' = fromATerm aa
+						  ab' = fromATerm ab in (Isect     aa' ab')
+    fromATerm (AAppl "Union"     [ aa,ab ]) = let aa' = fromATerm aa
+						  ab' = fromATerm ab in (Union     aa' ab')
     fromATerm u = fromATermError "CharClass" u
 
 instance ATermConvertible Associativity where
-    toATerm Sdf_left = (AAppl "Sdf_left" [ ])
-    toATerm Sdf_right = (AAppl "Sdf_right" [ ])
-    toATerm Sdf_non_assoc = (AAppl "Sdf_non_assoc" [ ])
-    toATerm Sdf_assoc = (AAppl "Sdf_assoc" [ ])
-    fromATerm (AAppl "Sdf_left" [ ]) = let in Sdf_left
-    fromATerm (AAppl "Sdf_right" [ ]) = let in Sdf_right
-    fromATerm (AAppl "Sdf_non_assoc" [ ]) = let in Sdf_non_assoc
-    fromATerm (AAppl "Sdf_assoc" [ ]) = let in Sdf_assoc
+    toATerm Left     = (AAppl "Left"     [ ])
+    toATerm Right     = (AAppl "Right"     [ ])
+    toATerm NonAssoc      = (AAppl "NonAssoc"      [ ])
+    toATerm Assoc     = (AAppl "Assoc"     [ ])
+    fromATerm (AAppl "Left"     [ ]) = let in Left    
+    fromATerm (AAppl "Right"     [ ]) = let in Right    
+    fromATerm (AAppl "NonAssoc"      [ ]) = let in NonAssoc     
+    fromATerm (AAppl "Assoc"     [ ]) = let in Assoc    
     fromATerm u = fromATermError "Associativity" u
 
 instance ATermConvertible Group where
-    toATerm (Sdf_simple_group aa) = (AAppl "Sdf_simple_group" [ toATerm aa ])
-    toATerm (Sdf_prods_group aa) = (AAppl "Sdf_prods_group" [ toATerm aa ])
-    toATerm (Sdf_assoc_group aa ab) = (AAppl "Sdf_assoc_group" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_simple_group" [ aa ]) = let aa' = fromATerm aa in (Sdf_simple_group aa')
-    fromATerm (AAppl "Sdf_prods_group" [ aa ]) = let aa' = fromATerm aa in (Sdf_prods_group aa')
-    fromATerm (AAppl "Sdf_assoc_group" [ aa,ab ]) = let aa' = fromATerm aa
-							ab' = fromATerm ab in (Sdf_assoc_group aa' ab')
+    toATerm (SimpleGroup      aa) = (AAppl "SimpleGroup"      [ toATerm aa ])
+    toATerm (ProdsGroup      aa) = (AAppl "ProdsGroup"      [ toATerm aa ])
+    toATerm (AssocGroup      aa ab) = (AAppl "AssocGroup"      [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "SimpleGroup"      [ aa ]) = let aa' = fromATerm aa in (SimpleGroup      aa')
+    fromATerm (AAppl "ProdsGroup"      [ aa ]) = let aa' = fromATerm aa in (ProdsGroup      aa')
+    fromATerm (AAppl "AssocGroup"      [ aa,ab ]) = let aa' = fromATerm aa
+							ab' = fromATerm ab in (AssocGroup      aa' ab')
     fromATerm u = fromATermError "Group" u
 
 instance ATermConvertible Priority where
-    toATerm (Sdf_chain aa) = (AAppl "Sdf_chain" [ toATerm aa ])
-    toATerm (Sdf_assoc1 aa ab ac) = (AAppl "Sdf_assoc1" [ toATerm aa,toATerm ab,toATerm ac ])
-    fromATerm (AAppl "Sdf_chain" [ aa ]) = let aa' = fromATerm aa in (Sdf_chain aa')
-    fromATerm (AAppl "Sdf_assoc1" [ aa,ab,ac ]) = let aa' = fromATerm aa
+    toATerm (Chain     aa) = (AAppl "Chain"     [ toATerm aa ])
+    toATerm (Assoc1     aa ab ac) = (AAppl "Assoc1"     [ toATerm aa,toATerm ab,toATerm ac ])
+    fromATerm (AAppl "Chain"     [ aa ]) = let aa' = fromATerm aa in (Chain     aa')
+    fromATerm (AAppl "Assoc1"     [ aa,ab,ac ]) = let aa' = fromATerm aa
 						      ab' = fromATerm ab
-						      ac' = fromATerm ac in (Sdf_assoc1 aa' ab' ac')
+						      ac' = fromATerm ac in (Assoc1     aa' ab' ac')
     fromATerm u = fromATermError "Priority" u
 
 instance ATermConvertible Priorities where
-    toATerm (Sdf_comma aa) = (AAppl "Sdf_comma" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_comma" [ aa ]) = let aa' = fromATerm aa in (Sdf_comma aa')
+    toATerm (Comma     aa) = (AAppl "Comma"     [ toATerm aa ])
+    fromATerm (AAppl "Comma"     [ aa ]) = let aa' = fromATerm aa in (Comma     aa')
     fromATerm u = fromATermError "Priorities" u
 
 instance ATermConvertible IntCon where
-    toATerm (Sdf_natural aa) = (AAppl "Sdf_natural" [ toATerm aa ])
-    toATerm (Sdf_positive aa) = (AAppl "Sdf_positive" [ toATerm aa ])
-    toATerm (Sdf_negative aa) = (AAppl "Sdf_negative" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_natural" [ aa ]) = let aa' = fromATerm aa in (Sdf_natural aa')
-    fromATerm (AAppl "Sdf_positive" [ aa ]) = let aa' = fromATerm aa in (Sdf_positive aa')
-    fromATerm (AAppl "Sdf_negative" [ aa ]) = let aa' = fromATerm aa in (Sdf_negative aa')
+    toATerm (Natural     aa) = (AAppl "Natural"     [ toATerm aa ])
+    toATerm (Positive     aa) = (AAppl "Positive"     [ toATerm aa ])
+    toATerm (Negative     aa) = (AAppl "Negative"     [ toATerm aa ])
+    fromATerm (AAppl "Natural"     [ aa ]) = let aa' = fromATerm aa in (Natural     aa')
+    fromATerm (AAppl "Positive"     [ aa ]) = let aa' = fromATerm aa in (Positive     aa')
+    fromATerm (AAppl "Negative"     [ aa ]) = let aa' = fromATerm aa in (Negative     aa')
     fromATerm u = fromATermError "IntCon" u
 
 instance ATermConvertible Renamings where
-    toATerm (Sdf_renamings aa) = (AAppl "Sdf_renamings" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_renamings" [ aa ]) = let aa' = fromATerm aa in (Sdf_renamings aa')
+    toATerm (Renamings     aa) = (AAppl "Renamings"     [ toATerm aa ])
+    fromATerm (AAppl "Renamings"     [ aa ]) = let aa' = fromATerm aa in (Renamings     aa')
     fromATerm u = fromATermError "Renamings" u
 
 instance ATermConvertible Renaming where
-    toATerm (Sdf_symbol aa ab) = (AAppl "Sdf_symbol" [ toATerm aa,toATerm ab ])
-    toATerm (Sdf_production aa ab) = (AAppl "Sdf_production" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_symbol" [ aa,ab ]) = let aa' = fromATerm aa
-						   ab' = fromATerm ab in (Sdf_symbol aa' ab')
-    fromATerm (AAppl "Sdf_production" [ aa,ab ]) = let aa' = fromATerm aa
-						       ab' = fromATerm ab in (Sdf_production aa' ab')
+    toATerm (Symbol     aa ab) = (AAppl "Symbol"     [ toATerm aa,toATerm ab ])
+    toATerm (Production     aa ab) = (AAppl "Production"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "Symbol"     [ aa,ab ]) = let aa' = fromATerm aa
+						   ab' = fromATerm ab in (Symbol     aa' ab')
+    fromATerm (AAppl "Production"     [ aa,ab ]) = let aa' = fromATerm aa
+						       ab' = fromATerm ab in (Production     aa' ab')
     fromATerm u = fromATermError "Renaming" u
 
 instance ATermConvertible Definition where
-    toATerm (Sdf_list4 aa) = (AAppl "Sdf_list4" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list4" [ aa ]) = let aa' = fromATerm aa in (Sdf_list4 aa')
+    toATerm (List4     aa) = (AAppl "List4"     [ toATerm aa ])
+    fromATerm (AAppl "List4"     [ aa ]) = let aa' = fromATerm aa in (List4     aa')
     fromATerm u = fromATermError "Definition" u
 
 instance ATermConvertible Module where
-    toATerm (Sdf_module_ aa ab ac) = (AAppl "Sdf_module_" [ toATerm aa,toATerm ab,toATerm ac ])
-    fromATerm (AAppl "Sdf_module_" [ aa,ab,ac ]) = let aa' = fromATerm aa
+    toATerm (Module      aa ab ac) = (AAppl "Module"      [ toATerm aa,toATerm ab,toATerm ac ])
+    fromATerm (AAppl "Module"      [ aa,ab,ac ]) = let aa' = fromATerm aa
 						       ab' = fromATerm ab
-						       ac' = fromATerm ac in (Sdf_module_ aa' ab' ac')
+						       ac' = fromATerm ac in (Module      aa' ab' ac')
     fromATerm u = fromATermError "Module" u
 
 instance ATermConvertible Section where
-    toATerm (Sdf_exports_ aa) = (AAppl "Sdf_exports_" [ toATerm aa ])
-    toATerm (Sdf_hiddens aa) = (AAppl "Sdf_hiddens" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_exports_" [ aa ]) = let aa' = fromATerm aa in (Sdf_exports_ aa')
-    fromATerm (AAppl "Sdf_hiddens" [ aa ]) = let aa' = fromATerm aa in (Sdf_hiddens aa')
+    toATerm (Exports      aa) = (AAppl "Exports"      [ toATerm aa ])
+    toATerm (Hiddens     aa) = (AAppl "Hiddens"     [ toATerm aa ])
+    fromATerm (AAppl "Exports"      [ aa ]) = let aa' = fromATerm aa in (Exports      aa')
+    fromATerm (AAppl "Hiddens"     [ aa ]) = let aa' = fromATerm aa in (Hiddens     aa')
     fromATerm u = fromATermError "Section" u
 
 instance ATermConvertible Sections where
-    toATerm (Sdf_list5 aa) = (AAppl "Sdf_list5" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list5" [ aa ]) = let aa' = fromATerm aa in (Sdf_list5 aa')
+    toATerm (List5     aa) = (AAppl "List5"     [ toATerm aa ])
+    fromATerm (AAppl "List5"     [ aa ]) = let aa' = fromATerm aa in (List5     aa')
     fromATerm u = fromATermError "Sections" u
 
 instance ATermConvertible ModuleName where
-    toATerm (Sdf_unparameterized aa) = (AAppl "Sdf_unparameterized" [ toATerm aa ])
-    toATerm (Sdf_parameterized aa ab) = (AAppl "Sdf_parameterized" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_unparameterized" [ aa ]) = let aa' = fromATerm aa in (Sdf_unparameterized aa')
-    fromATerm (AAppl "Sdf_parameterized" [ aa,ab ]) = let aa' = fromATerm aa
-							  ab' = fromATerm ab in (Sdf_parameterized aa' ab')
+    toATerm (Unparameterized     aa) = (AAppl "Unparameterized"     [ toATerm aa ])
+    toATerm (Parameterized     aa ab) = (AAppl "Parameterized"     [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "Unparameterized"     [ aa ]) = let aa' = fromATerm aa in (Unparameterized     aa')
+    fromATerm (AAppl "Parameterized"     [ aa,ab ]) = let aa' = fromATerm aa
+							  ab' = fromATerm ab in (Parameterized     aa' ab')
     fromATerm u = fromATermError "ModuleName" u
 
 instance ATermConvertible ImpSection where
-    toATerm (Sdf_imports_ aa) = (AAppl "Sdf_imports_" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_imports_" [ aa ]) = let aa' = fromATerm aa in (Sdf_imports_ aa')
+    toATerm (Imports      aa) = (AAppl "Imports"      [ toATerm aa ])
+    fromATerm (AAppl "Imports"      [ aa ]) = let aa' = fromATerm aa in (Imports      aa')
     fromATerm u = fromATermError "ImpSection" u
 
 instance ATermConvertible Imports where
-    toATerm (Sdf_list6 aa) = (AAppl "Sdf_list6" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list6" [ aa ]) = let aa' = fromATerm aa in (Sdf_list6 aa')
+    toATerm (List6     aa) = (AAppl "List6"     [ toATerm aa ])
+    fromATerm (AAppl "List6"     [ aa ]) = let aa' = fromATerm aa in (List6     aa')
     fromATerm u = fromATermError "Imports" u
 
 instance ATermConvertible Import where
-    toATerm (Sdf_module1 aa) = (AAppl "Sdf_module1" [ toATerm aa ])
-    toATerm (Sdf_renamed_module aa ab) = (AAppl "Sdf_renamed_module" [ toATerm aa,toATerm ab ])
-    fromATerm (AAppl "Sdf_module1" [ aa ]) = let aa' = fromATerm aa in (Sdf_module1 aa')
-    fromATerm (AAppl "Sdf_renamed_module" [ aa,ab ]) = let aa' = fromATerm aa
-							   ab' = fromATerm ab in (Sdf_renamed_module aa' ab')
+    toATerm (Module1     aa) = (AAppl "Module1"     [ toATerm aa ])
+    toATerm (RenamedModule      aa ab) = (AAppl "RenamedModule"      [ toATerm aa,toATerm ab ])
+    fromATerm (AAppl "Module1"     [ aa ]) = let aa' = fromATerm aa in (Module1     aa')
+    fromATerm (AAppl "RenamedModule"      [ aa,ab ]) = let aa' = fromATerm aa
+							   ab' = fromATerm ab in (RenamedModule      aa' ab')
     fromATerm u = fromATermError "Import" u
 
 instance ATermConvertible Symbols where
-    toATerm (Sdf_list7 aa) = (AAppl "Sdf_list7" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list7" [ aa ]) = let aa' = fromATerm aa in (Sdf_list7 aa')
+    toATerm (List7     aa) = (AAppl "List7"     [ toATerm aa ])
+    fromATerm (AAppl "List7"     [ aa ]) = let aa' = fromATerm aa in (List7     aa')
     fromATerm u = fromATermError "Symbols" u
 
 instance ATermConvertible Attributes where
-    toATerm (Sdf_attrs aa) = (AAppl "Sdf_attrs" [ toATerm aa ])
-    toATerm Sdf_no_attrs = (AAppl "Sdf_no_attrs" [ ])
-    fromATerm (AAppl "Sdf_attrs" [ aa ]) = let aa' = fromATerm aa in (Sdf_attrs aa')
-    fromATerm (AAppl "Sdf_no_attrs" [ ]) = let in Sdf_no_attrs
+    toATerm (Attrs     aa) = (AAppl "Attrs"     [ toATerm aa ])
+    toATerm NoAttrs      = (AAppl "NoAttrs"      [ ])
+    fromATerm (AAppl "Attrs"     [ aa ]) = let aa' = fromATerm aa in (Attrs     aa')
+    fromATerm (AAppl "NoAttrs"      [ ]) = let in NoAttrs     
     fromATerm u = fromATermError "Attributes" u
 
 instance ATermConvertible Productions where
-    toATerm (Sdf_list8 aa) = (AAppl "Sdf_list8" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_list8" [ aa ]) = let aa' = fromATerm aa in (Sdf_list8 aa')
+    toATerm (List8     aa) = (AAppl "List8"     [ toATerm aa ])
+    fromATerm (AAppl "List8"     [ aa ]) = let aa' = fromATerm aa in (List8     aa')
     fromATerm u = fromATermError "Productions" u
 
 instance ATermConvertible SDF where
-    toATerm (Sdf_definition aa) = (AAppl "Sdf_definition" [ toATerm aa ])
-    fromATerm (AAppl "Sdf_definition" [ aa ]) = let aa' = fromATerm aa in (Sdf_definition aa')
+    toATerm (Definition     aa) = (AAppl "Definition"     [ toATerm aa ])
+    fromATerm (AAppl "Definition"     [ aa ]) = let aa' = fromATerm aa in (Definition     aa')
     fromATerm u = fromATermError "SDF" u
 
 --  Imported from other files :-
