@@ -27,6 +27,7 @@ data Grammar = Aliases     Aliases
 	     | ContextFreePriorities       Priorities
 	     | LexicalRestrictions      Restrictions
 	     | ContextFreeRestrictions       Restrictions
+         | ContextFreeStartSymbols [Symbol]
       deriving (Data, Typeable, Generic, Show)
 
 instance ATermConvertible Alias
@@ -80,6 +81,7 @@ data AFun = Literal     Literal
 
 instance ATermConvertible ATerm'
 data ATerm' = Fun     AFun
+    | Appl AFun [ATerm']
       deriving (Data, Typeable, Generic, Show)
 
 instance ATermConvertible Symbol
@@ -290,13 +292,13 @@ type ModuleId = String
 --     fromATerm (AAppl "LexicalRestrictions"      [ aa ]) = let aa' = fromATerm aa in (LexicalRestrictions      aa')
 --     fromATerm (AAppl "ContextFreeRestrictions"       [ aa ]) = let aa' = fromATerm aa in (ContextFreeRestrictions       aa')
 --     fromATerm u = fromATermError "Grammar" u
--- 
+--
 -- instance ATermConvertible Alias where
 --     toATerm (Alias     aa ab) = (AAppl "Alias"     [ toATerm aa,toATerm ab ])
 --     fromATerm (AAppl "Alias"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						  ab' = fromATerm ab in (Alias     aa' ab')
 --     fromATerm u = fromATermError "Alias" u
--- 
+--
 -- instance ATermConvertible Lookahead where
 --     toATerm (CharClass      aa) = (AAppl "CharClass"      [ toATerm aa ])
 --     toATerm (Seq     aa ab) = (AAppl "Seq"     [ toATerm aa,toATerm ab ])
@@ -304,7 +306,7 @@ type ModuleId = String
 --     fromATerm (AAppl "Seq"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						ab' = fromATerm ab in (Seq     aa' ab')
 --     fromATerm u = fromATermError "Lookahead" u
--- 
+--
 -- instance ATermConvertible Lookaheads where
 --     toATerm (Single     aa) = (AAppl "Single"     [ toATerm aa ])
 --     toATerm (Alt     aa ab) = (AAppl "Alt"     [ toATerm aa,toATerm ab ])
@@ -314,13 +316,13 @@ type ModuleId = String
 -- 						ab' = fromATerm ab in (Alt     aa' ab')
 --     fromATerm (AAppl "List1"     [ aa ]) = let aa' = fromATerm aa in (List1     aa')
 --     fromATerm u = fromATermError "Lookaheads" u
--- 
+--
 -- instance ATermConvertible Restriction where
 --     toATerm (Follow     aa ab) = (AAppl "Follow"     [ toATerm aa,toATerm ab ])
 --     fromATerm (AAppl "Follow"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						   ab' = fromATerm ab in (Follow     aa' ab')
 --     fromATerm u = fromATermError "Restriction" u
--- 
+--
 -- instance ATermConvertible Attribute where
 --     toATerm Reject     = (AAppl "Reject"     [ ])
 --     toATerm Prefer     = (AAppl "Prefer"     [ ])
@@ -343,31 +345,31 @@ type ModuleId = String
 --     fromATerm (AAppl "Atr"     [ aa ]) = let aa' = fromATerm aa in (Atr     aa')
 --     fromATerm (AAppl "Id"     [ aa ]) = let aa' = fromATerm aa in (Id     aa')
 --     fromATerm u = fromATermError "Attribute" u
--- 
+--
 -- instance ATermConvertible OptExp where
 --     toATerm (Present     aa) = (AAppl "Present"     [ toATerm aa ])
 --     toATerm Absent     = (AAppl "Absent"     [ ])
 --     fromATerm (AAppl "Present"     [ aa ]) = let aa' = fromATerm aa in (Present     aa')
 --     fromATerm (AAppl "Absent"     [ ]) = let in Absent
 --     fromATerm u = fromATermError "OptExp" u
--- 
+--
 -- instance ATermConvertible RealCon where
 --     toATerm (RealCon      aa ab ac) = (AAppl "RealCon"      [ toATerm aa,toATerm ab,toATerm ac ])
 --     fromATerm (AAppl "RealCon"      [ aa,ab,ac ]) = let aa' = fromATerm aa
 -- 							ab' = fromATerm ab
 -- 							ac' = fromATerm ac in (RealCon      aa' ab' ac')
 --     fromATerm u = fromATermError "RealCon" u
--- 
+--
 -- instance ATermConvertible AFun where
 --     toATerm (Literal     aa) = (AAppl "Literal"     [ toATerm aa ])
 --     fromATerm (AAppl "Literal"     [ aa ]) = let aa' = fromATerm aa in (Literal     aa')
 --     fromATerm u = fromATermError "AFun" u
--- 
+--
 -- instance ATermConvertible ATerm' where
 --     toATerm (Fun     aa) = (AAppl "Fun"     [ toATerm aa ])
 --     fromATerm (AAppl "Fun"     [ aa ]) = let aa' = fromATerm aa in (Fun     aa')
 --     fromATerm u = fromATermError "ATerm'" u
--- 
+--
 -- instance ATermConvertible Symbol where
 --     toATerm (Label     aa ab) = (AAppl "Label"     [ toATerm aa,toATerm ab ])
 --     toATerm (Lit     aa) = (AAppl "Lit"     [ toATerm aa ])
@@ -428,14 +430,14 @@ type ModuleId = String
 --     fromATerm (AAppl "Start"     [ ]) = let in Start
 --     fromATerm (AAppl "FileStart"      [ ]) = let in FileStart
 --     fromATerm u = fromATermError "Symbol" u
--- 
+--
 -- instance ATermConvertible Literal where
 --     toATerm (Quoted     aa) = (AAppl "Quoted"     [ toATerm aa ])
 --     toATerm (Uqlit     aa) = (AAppl "Uqlit"     [ toATerm aa ])
 --     fromATerm (AAppl "Quoted"     [ aa ]) = let aa' = fromATerm aa in (Quoted     aa')
 --     fromATerm (AAppl "Uqlit"     [ aa ]) = let aa' = fromATerm aa in (Uqlit     aa')
 --     fromATerm u = fromATermError "Literal" u
--- 
+--
 -- instance ATermConvertible Production where
 --     toATerm (ProdFun      aa ab ac ad) = (AAppl "ProdFun"      [ toATerm aa,toATerm ab,toATerm ac,toATerm ad ])
 --     toATerm (Prod     aa ab ac) = (AAppl "Prod"     [ toATerm aa,toATerm ab,toATerm ac ])
@@ -447,7 +449,7 @@ type ModuleId = String
 -- 						    ab' = fromATerm ab
 -- 						    ac' = fromATerm ac in (Prod     aa' ab' ac')
 --     fromATerm u = fromATermError "Production" u
--- 
+--
 -- instance ATermConvertible Character where
 --     toATerm (Numeric     aa) = (AAppl "Numeric"     [ toATerm aa ])
 --     toATerm (Short     aa) = (AAppl "Short"     [ toATerm aa ])
@@ -462,7 +464,7 @@ type ModuleId = String
 --     fromATerm (AAppl "Bot"     [ ]) = let in Bot
 --     fromATerm (AAppl "LabelStart"      [ ]) = let in LabelStart
 --     fromATerm u = fromATermError "Character" u
--- 
+--
 -- instance ATermConvertible CharRange where
 --     toATerm (Character     aa) = (AAppl "Character"     [ toATerm aa ])
 --     toATerm (Range     aa ab) = (AAppl "Range"     [ toATerm aa,toATerm ab ])
@@ -470,7 +472,7 @@ type ModuleId = String
 --     fromATerm (AAppl "Range"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						  ab' = fromATerm ab in (Range     aa' ab')
 --     fromATerm u = fromATermError "CharRange" u
--- 
+--
 -- instance ATermConvertible CharRanges where
 --     toATerm (CharRange     aa) = (AAppl "CharRange"     [ toATerm aa ])
 --     toATerm (Conc     aa ab) = (AAppl "Conc"     [ toATerm aa,toATerm ab ])
@@ -478,14 +480,14 @@ type ModuleId = String
 --     fromATerm (AAppl "Conc"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						 ab' = fromATerm ab in (Conc     aa' ab')
 --     fromATerm u = fromATermError "CharRanges" u
--- 
+--
 -- instance ATermConvertible OptCharRanges where
 --     toATerm Absent1     = (AAppl "Absent1"     [ ])
 --     toATerm (Present1     aa) = (AAppl "Present1"     [ toATerm aa ])
 --     fromATerm (AAppl "Absent1"     [ ]) = let in Absent1
 --     fromATerm (AAppl "Present1"     [ aa ]) = let aa' = fromATerm aa in (Present1     aa')
 --     fromATerm u = fromATermError "OptCharRanges" u
--- 
+--
 -- instance ATermConvertible CharClass where
 --     toATerm (SimpleCharclass      aa) = (AAppl "SimpleCharclass"      [ toATerm aa ])
 --     toATerm (Comp     aa) = (AAppl "Comp"     [ toATerm aa ])
@@ -501,7 +503,7 @@ type ModuleId = String
 --     fromATerm (AAppl "Union"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						  ab' = fromATerm ab in (Union     aa' ab')
 --     fromATerm u = fromATermError "CharClass" u
--- 
+--
 -- instance ATermConvertible Associativity where
 --     toATerm Left     = (AAppl "Left"     [ ])
 --     toATerm Right     = (AAppl "Right"     [ ])
@@ -512,7 +514,7 @@ type ModuleId = String
 --     fromATerm (AAppl "NonAssoc"      [ ]) = let in NonAssoc
 --     fromATerm (AAppl "Assoc"     [ ]) = let in Assoc
 --     fromATerm u = fromATermError "Associativity" u
--- 
+--
 -- instance ATermConvertible Group where
 --     toATerm (SimpleGroup      aa) = (AAppl "SimpleGroup"      [ toATerm aa ])
 --     toATerm (ProdsGroup      aa) = (AAppl "ProdsGroup"      [ toATerm aa ])
@@ -522,7 +524,7 @@ type ModuleId = String
 --     fromATerm (AAppl "AssocGroup"      [ aa,ab ]) = let aa' = fromATerm aa
 -- 							ab' = fromATerm ab in (AssocGroup      aa' ab')
 --     fromATerm u = fromATermError "Group" u
--- 
+--
 -- instance ATermConvertible Priority where
 --     toATerm (Chain     aa) = (AAppl "Chain"     [ toATerm aa ])
 --     toATerm (Assoc1     aa ab ac) = (AAppl "Assoc1"     [ toATerm aa,toATerm ab,toATerm ac ])
@@ -531,12 +533,12 @@ type ModuleId = String
 -- 						      ab' = fromATerm ab
 -- 						      ac' = fromATerm ac in (Assoc1     aa' ab' ac')
 --     fromATerm u = fromATermError "Priority" u
--- 
+--
 -- instance ATermConvertible Priorities where
 --     toATerm (Comma     aa) = (AAppl "Comma"     [ toATerm aa ])
 --     fromATerm (AAppl "Comma"     [ aa ]) = let aa' = fromATerm aa in (Comma     aa')
 --     fromATerm u = fromATermError "Priorities" u
--- 
+--
 -- instance ATermConvertible IntCon where
 --     toATerm (Natural     aa) = (AAppl "Natural"     [ toATerm aa ])
 --     toATerm (Positive     aa) = (AAppl "Positive"     [ toATerm aa ])
@@ -545,12 +547,12 @@ type ModuleId = String
 --     fromATerm (AAppl "Positive"     [ aa ]) = let aa' = fromATerm aa in (Positive     aa')
 --     fromATerm (AAppl "Negative"     [ aa ]) = let aa' = fromATerm aa in (Negative     aa')
 --     fromATerm u = fromATermError "IntCon" u
--- 
+--
 -- instance ATermConvertible Renamings where
 --     toATerm (Renamings     aa) = (AAppl "Renamings"     [ toATerm aa ])
 --     fromATerm (AAppl "Renamings"     [ aa ]) = let aa' = fromATerm aa in (Renamings     aa')
 --     fromATerm u = fromATermError "Renamings" u
--- 
+--
 -- instance ATermConvertible Renaming where
 --     toATerm (Symbol     aa ab) = (AAppl "Symbol"     [ toATerm aa,toATerm ab ])
 --     toATerm (Production     aa ab) = (AAppl "Production"     [ toATerm aa,toATerm ab ])
@@ -559,21 +561,21 @@ type ModuleId = String
 --     fromATerm (AAppl "Production"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 						       ab' = fromATerm ab in (Production     aa' ab')
 --     fromATerm u = fromATermError "Renaming" u
--- 
+--
 -- instance ATermConvertible Module where
 --     toATerm (Module      aa ab ac) = (AAppl "Module"      [ toATerm aa,toATerm ab,toATerm ac ])
 --     fromATerm (AAppl "Module"      [ aa,ab,ac ]) = let aa' = fromATerm aa
 -- 						       ab' = fromATerm ab
 -- 						       ac' = fromATerm ac in (Module      aa' ab' ac')
 --     fromATerm u = fromATermError "Module" u
--- 
+--
 -- instance ATermConvertible Section where
 --     toATerm (Exports      aa) = (AAppl "Exports"      [ toATerm aa ])
 --     toATerm (Hiddens     aa) = (AAppl "Hiddens"     [ toATerm aa ])
 --     fromATerm (AAppl "Exports"      [ aa ]) = let aa' = fromATerm aa in (Exports      aa')
 --     fromATerm (AAppl "Hiddens"     [ aa ]) = let aa' = fromATerm aa in (Hiddens     aa')
 --     fromATerm u = fromATermError "Section" u
--- 
+--
 -- instance ATermConvertible ModuleName where
 --     toATerm (Unparameterized     aa) = (AAppl "Unparameterized"     [ toATerm aa ])
 --     toATerm (Parameterized     aa ab) = (AAppl "Parameterized"     [ toATerm aa,toATerm ab ])
@@ -581,12 +583,12 @@ type ModuleId = String
 --     fromATerm (AAppl "Parameterized"     [ aa,ab ]) = let aa' = fromATerm aa
 -- 							  ab' = fromATerm ab in (Parameterized     aa' ab')
 --     fromATerm u = fromATermError "ModuleName" u
--- 
+--
 -- instance ATermConvertible ImpSection where
 --     toATerm (Imports      aa) = (AAppl "Imports"      [ toATerm aa ])
 --     fromATerm (AAppl "Imports"      [ aa ]) = let aa' = fromATerm aa in (Imports      aa')
 --     fromATerm u = fromATermError "ImpSection" u
--- 
+--
 -- instance ATermConvertible Import where
 --     toATerm (Module1     aa) = (AAppl "Module1"     [ toATerm aa ])
 --     toATerm (RenamedModule      aa ab) = (AAppl "RenamedModule"      [ toATerm aa,toATerm ab ])
@@ -594,17 +596,17 @@ type ModuleId = String
 --     fromATerm (AAppl "RenamedModule"      [ aa,ab ]) = let aa' = fromATerm aa
 -- 							   ab' = fromATerm ab in (RenamedModule      aa' ab')
 --     fromATerm u = fromATermError "Import" u
--- 
+--
 -- instance ATermConvertible Attributes where
 --     toATerm (Attrs     aa) = (AAppl "Attrs"     [ toATerm aa ])
 --     toATerm NoAttrs      = (AAppl "NoAttrs"      [ ])
 --     fromATerm (AAppl "Attrs"     [ aa ]) = let aa' = fromATerm aa in (Attrs     aa')
 --     fromATerm (AAppl "NoAttrs"      [ ]) = let in NoAttrs
 --     fromATerm u = fromATermError "Attributes" u
--- 
+--
 -- instance ATermConvertible SDF where
 --     toATerm (Definition     aa) = (AAppl "Definition"     [ toATerm aa ])
 --     fromATerm (AAppl "Definition"     [ aa ]) = let aa' = fromATerm aa in (Definition     aa')
 --     fromATerm u = fromATermError "SDF" u
--- 
+--
 -- --  Imported from other files :-
