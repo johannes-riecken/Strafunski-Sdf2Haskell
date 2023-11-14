@@ -11,8 +11,11 @@ deriving instance Data ATerm
 patchSdf :: MonadPlus m => ATerm -> m ATerm
 patchSdf (AAppl "amb" [AList [AAppl "Layout" [], AAppl "Sort" [AAppl "\"LAYOUT\"" []]]]) = pure $ AAppl "Sort" [AAppl "\"LAYOUT\"" []]
 patchSdf (AAppl "Present" [AAppl "Conc" xs]) = pure $ AAppl "Present1" [AAppl "Conc" xs]
+patchSdf (AAppl "Present" [AAppl "Range" xs]) = pure $ AAppl "Present1" [AAppl "Range" xs]
 patchSdf (AAppl "Lit" [AAppl x []]) | length x > 1 && head x == '"' && last x == '"'  = pure $ AAppl "Lit" [AAppl "Quoted" [AAppl x []]]
 patchSdf (AAppl "Assoc" xs) = pure $ AAppl "Atr" xs
+patchSdf (AAppl "Left" xs) = pure $ AAppl "LeftAssoc" xs
+patchSdf (AAppl "Right" xs) = pure $ AAppl "RightAssoc" xs
 patchSdf (AAppl "Unquoted" xs) = pure $ AAppl "Uqlit" xs
 patchSdf _ = mzero
 
@@ -25,13 +28,15 @@ resolveAmb (AAppl "amb" [AList xs]) = hoistMaybe $ find (\case
     _ -> False) xs
 resolveAmb _ = mzero
 
-patchConc :: ATerm -> Bool -> ATerm
-patchConc (AAppl "Conc" xs) _ = AAppl "Conc" (fmap (`patchConc` True) xs)
-patchConc (AAppl "Range" xs) True = AAppl "CharRange" [AAppl "Range" $ fmap (`patchConc` True) xs]
-patchConc xxs@(AAppl "Short" _) True = AAppl "CharRange" [AAppl "Character" [xxs]]
-patchConc (AAppl nm xs) p = AAppl nm $ fmap (`patchConc` p) xs
-patchConc x@(AInt _) _ = x
-patchConc (AList xs) p = AList $ fmap (`patchConc` p) xs
+patchPresent1 :: ATerm -> Bool -> ATerm
+patchPresent1 (AAppl "Present1" xs) _ = AAppl "Present1" (fmap (`patchPresent1` True) xs)
+-- patchPresent1 (AAppl "Range" xs) _ = AAppl "Range" (fmap (`patchPresent1` True) xs)
+-- TODO: Add case for when it's not Conc, but CharRange
+patchPresent1 (AAppl "Range" xs) True = AAppl "CharRange" [AAppl "Range" $ fmap (`patchPresent1` True) xs]
+patchPresent1 xxs@(AAppl "Short" _) True = AAppl "CharRange" [AAppl "Character" [xxs]]
+patchPresent1 (AAppl nm xs) p = AAppl nm $ fmap (`patchPresent1` p) xs
+patchPresent1 x@(AInt _) _ = x
+patchPresent1 (AList xs) p = AList $ fmap (`patchPresent1` p) xs
 
 patchRange :: ATerm -> Bool -> ATerm
 patchRange (AAppl "Range" xs) _ = AAppl "Range" (fmap (`patchRange` True) xs)
@@ -63,16 +68,24 @@ patchAttrs (AAppl nm xs) p = AAppl nm $ fmap (`patchAttrs` p) xs
 patchAttrs x@(AInt _) _ = x
 patchAttrs (AList xs) p = AList $ fmap (`patchAttrs` p) xs
 
+patchImports :: ATerm -> Bool -> ATerm
+patchImports (AAppl "Imports" xs) _ = AAppl "Imports" (fmap (`patchImports` True) xs)
+patchImports (AAppl "Module" xs) True = AAppl "Module1" xs
+patchImports (AAppl nm xs) p = AAppl nm $ fmap (`patchImports` p) xs
+patchImports x@(AInt _) _ = x
+patchImports (AList xs) p = AList $ fmap (`patchImports` p) xs
+
 main :: IO ()
 main = do
-    x <- readFile "Operators.aterm"
+    x <- readFile "Expression.aterm"
     putStrLn . writeATerm
         . fromJust
         . applyTP (full_tdTP (tryTP $ monoTP resolveAmb))
+        . (`patchImports` False)
         . (`patchAttrs` False)
         . (`patchProd` False)
         . (`unpatchRange` False)
-        . (`patchConc` False)
+        . (`patchPresent1` False)
         . (`patchRange` False)
         . fromJust
         . applyTP (full_tdTP (tryTP $ monoTP patchSdf))
