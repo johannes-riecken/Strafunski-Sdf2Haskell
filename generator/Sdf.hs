@@ -154,8 +154,8 @@ data CharClass = SimpleCharclass      OptCharRanges
       deriving (Data, Typeable, Generic, Show)
 
 instance ATermConvertible Associativity
-data Associativity = Left
-		   | Right
+data Associativity = LeftAssoc
+		   | RightAssoc
 		   | NonAssoc
 		   | Assoc
       deriving (Data, Typeable, Generic, Show)
@@ -171,9 +171,7 @@ data Priority = Chain     [Group]
 	      | Assoc1     Group Associativity Group
       deriving (Data, Typeable, Generic, Show)
 
-instance ATermConvertible Priorities
-data Priorities = Comma     [Priority]
-      deriving (Data, Typeable, Generic, Show)
+type Priorities = [Priority]
 
 instance ATermConvertible IntCon
 data IntCon = Natural     NatCon
